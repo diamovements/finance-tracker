@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.wiremock.integrations.testcontainers:wiremock-testcontainers-module:1.0-alpha-13" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.wiremock.integrations.testcontainers" artifactId="wiremock-testcontainers-module" version="1.0-alpha-13" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.wiremock.integrations.testcontainers/wiremock-testcontainers-module/1.0-alpha-13/aa838e2b432c20ba44f20cb98fe75bd80ce40b84/wiremock-testcontainers-module-1.0-alpha-13.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.wiremock.integrations.testcontainers/wiremock-testcontainers-module/1.0-alpha-13/c271cc1bde7af9ee715510cfcbb03dbe2af22a5f/wiremock-testcontainers-module-1.0-alpha-13-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
