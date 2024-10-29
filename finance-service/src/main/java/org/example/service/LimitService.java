@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.entity.Limit;
 import org.example.entity.RecurringFrequency;
+import org.example.exception.LimitNotFoundException;
 import org.example.repository.LimitRepository;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +57,12 @@ public class LimitService {
             limitRepository.delete(limitToDelete.get());
         } else {
             log.warn("No limit found for userId {} with frequency {}", userId, frequency);
+            throw new LimitNotFoundException("У вас нет лимита с такой частотой оплаты.");
         }
+    }
+
+    public BigDecimal getCurrentLimit(UUID userId) {
+        Limit limit = limitRepository.findByUserId(userId).stream().findFirst().orElse(null);
+        return limit != null ? limit.getMaxExpenseLimit() : BigDecimal.ZERO;
     }
 }

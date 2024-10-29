@@ -35,16 +35,17 @@ public class CategoryService{
     public void addCustomCategory(UUID userId, String name) {
         boolean exists = categoryRepository.existsByNameAndUserId(name, userId) ||
                 categoryRepository.existsByNameAndIsStandard(name, true);
+        log.info("Category exists: {}", exists);
         if (exists) {
             log.error("Category already exists: {}", name);
-            throw new IllegalArgumentException("Category already exists");
+            throw new IllegalArgumentException("Категория с таким именем уже есть.");
         }
 
         Category category = new Category();
         category.setName(name);
         category.setUserId(userId);
         category.setStandard(false);
-        log.info("New category saved: {}", category);
+        log.info("New category saved: {}", category.getName());
 
         categoryRepository.save(category);
     }

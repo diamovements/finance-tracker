@@ -1,6 +1,10 @@
 package org.example.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.client.UserClient;
+import org.example.dto.request.AddGoalRequest;
+import org.example.entity.SavingGoal;
+import org.example.service.SavingGoalService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,22 +18,25 @@ import java.util.UUID;
 @RequestMapping("/api/v1/saving-goals")
 public class SavingGoalController {
     private final SavingGoalService savingGoalService;
+    private final static String TOKEN = "Authorization";
+    private final UserClient userClient;
 
     @GetMapping("/all")
-    public List<SavingGoal> getAllGoals(@RequestParam("userId") UUID userId) {
+    public List<SavingGoal> getAllGoals(@RequestHeader(TOKEN) String token) {
+        UUID userId = userClient.getUserByToken(token);
         return savingGoalService.getUsersGoals(userId);
     }
 
     @PostMapping("/add")
-    public ResponseEntity<String> addGoal(@RequestParam("userId") UUID userId,
-                                          @RequestParam("goalAmount") BigDecimal goalAmount,
-                                          @RequestParam("endDate") LocalDate endDate) {
-        savingGoalService.addGoal(userId, goalAmount, endDate);
+    public ResponseEntity<String> addGoal(@RequestHeader(TOKEN) String token, @RequestBody AddGoalRequest request) {
+        UUID userId = userClient.getUserByToken(token);
+        savingGoalService.addGoal(userId, request);
         return ResponseEntity.ok("Goal added");
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteGoal(@RequestParam("userId") UUID userId) {
+    public ResponseEntity<String> deleteGoal(@RequestHeader(TOKEN) String token) {
+        UUID userId = userClient.getUserByToken(token);
         savingGoalService.deleteGoal(userId);
         return ResponseEntity.ok("Goal deleted");
     }

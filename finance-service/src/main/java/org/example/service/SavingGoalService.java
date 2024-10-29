@@ -2,7 +2,9 @@ package org.example.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.dto.request.AddGoalRequest;
 import org.example.entity.SavingGoal;
+import org.example.exception.GoalNotFoundException;
 import org.example.repository.SavingGoalRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +23,7 @@ public class SavingGoalService {
         return savingGoalRepository.findByUserId(userId);
     }
 
-    public void addGoal(UUID userId, BigDecimal goalAmount, LocalDate endDate) {
+    public void addGoal(UUID userId, AddGoalRequest request) {
         List<SavingGoal> goals = savingGoalRepository.findByUserId(userId);
 
         SavingGoal newGoal;
@@ -33,8 +35,8 @@ public class SavingGoalService {
             newGoal.setUserId(userId);
         }
 
-        newGoal.setGoalAmount(goalAmount);
-        newGoal.setEndDate(endDate);
+        newGoal.setGoalAmount(request.goalAmount());
+        newGoal.setEndDate(request.endDate());
         log.info("Saving goal: {}", newGoal);
 
         savingGoalRepository.save(newGoal);
@@ -48,7 +50,8 @@ public class SavingGoalService {
             log.info("Deleting goal: {}", goalToDelete);
             savingGoalRepository.delete(goalToDelete);
         } else {
-            log.info("No goal found for user: {}", userId);
+            log.error("No goal found for user: {}", userId);
+            throw new GoalNotFoundException("У вас нет целей для удаления.");
         }
     }
 }

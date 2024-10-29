@@ -1,0 +1,11 @@
+finance-service/target/
+finance-service/build/
+notification-service/target/
+notification-service/build/
+user-service/target/
+user-service/build/
+
+user-service/.gradle
+finance-service/.gradle
+.idea
+*.iml

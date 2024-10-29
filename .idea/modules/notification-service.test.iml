@@ -3,10 +3,7 @@
   <component name="NewModuleRootManager">
     <output-test url="file://$MODULE_DIR$/../../notification-service/build/classes/java/test" />
     <exclude-output />
-    <content url="file://$MODULE_DIR$/../../notification-service/src/test">
-      <sourceFolder url="file://$MODULE_DIR$/../../notification-service/src/test/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/../../notification-service/src/test/resources" type="java-test-resource" />
-    </content>
+    <content url="file://$MODULE_DIR$/../../notification-service/src/test" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="notification-service.main" />

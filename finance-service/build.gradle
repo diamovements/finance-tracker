@@ -41,6 +41,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation:3.3.4")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.3.4")
     implementation("org.postgresql:postgresql:42.7.4")
+    implementation("io.projectreactor:reactor-core:3.6.10")
+    implementation("org.springframework.boot:spring-boot-starter-webflux:3.3.4")
+    testImplementation("org.skyscreamer:jsonassert:2.0-rc1")
+    testImplementation("io.projectreactor:reactor-test:3.6.10")
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.1.3")
 
 
 }
