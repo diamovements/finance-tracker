@@ -3,6 +3,7 @@ package org.example.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.client.UserClient;
+import org.example.dto.UserDto;
 import org.example.dto.request.AddCategoryRequest;
 import org.example.entity.Category;
 import org.example.service.CategoryService;
@@ -36,7 +37,8 @@ public class CategoryController {
     @PostMapping("/add")
     public ResponseEntity<String> addCustomCategory(@RequestHeader(TOKEN) String token, @RequestBody AddCategoryRequest request) {
         UUID userId = userClient.getUserByToken(token);
-        categoryService.addCustomCategory(userId, request.name());
+        UserDto data = userClient.getUserData(token);
+        categoryService.addCustomCategory(userId, request, data);
         return ResponseEntity.ok("Category added");
     }
 

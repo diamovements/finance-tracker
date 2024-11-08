@@ -2,6 +2,7 @@ package org.example.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.client.UserClient;
+import org.example.dto.UserDto;
 import org.example.dto.request.AddTransactionRequest;
 import org.example.dto.response.TransactionResponse;
 import org.example.entity.Transaction;
@@ -9,6 +10,7 @@ import org.example.entity.TransactionType;
 import org.example.exception.LimitExceedException;
 import org.example.service.LimitService;
 import org.example.service.TransactionService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,8 +34,9 @@ public class TransactionController {
             @RequestBody AddTransactionRequest request) {
 
         UUID userId = userClient.getUserByToken(token);
+        UserDto data = userClient.getUserData(token);
         try {
-            transactionService.addTransaction(userId, request);
+            transactionService.addTransaction(userId, request, data);
         } catch (LimitExceedException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -41,11 +44,15 @@ public class TransactionController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<TransactionResponse>> getAllTransactions(@RequestHeader(TOKEN) String token) {
-        UUID userId = userClient.getUserByToken(token);
-        List<Transaction> transactions = transactionService.getAllTransactions(userId);
+    public ResponseEntity<List<TransactionResponse>> getAllTransactions(
+            @RequestHeader(TOKEN) String token,
+            @RequestParam(defaultValue = "0", name = "page") int page,
+            @RequestParam(defaultValue = "10", name = "size") int size) {
 
-        List<TransactionResponse> response = transactions.stream()
+        UUID userId = userClient.getUserByToken(token);
+        Page<Transaction> transactionsPage = transactionService.getAllTransactions(userId, page, size);
+
+        List<TransactionResponse> response = transactionsPage.stream()
                 .map(transaction -> new TransactionResponse(
                         transaction.getAmount(),
                         transaction.getCategory().getName(),

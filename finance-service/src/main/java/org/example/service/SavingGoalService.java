@@ -2,7 +2,10 @@ package org.example.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.dto.NotificationMessage;
+import org.example.dto.UserDto;
 import org.example.dto.request.AddGoalRequest;
+import org.example.entity.EventType;
 import org.example.entity.SavingGoal;
 import org.example.exception.GoalNotFoundException;
 import org.example.repository.SavingGoalRepository;
@@ -18,12 +21,13 @@ import java.util.UUID;
 @Slf4j
 public class SavingGoalService {
     private final SavingGoalRepository savingGoalRepository;
+    private final KafkaProducerService kafkaProducerService;
 
     public List<SavingGoal> getUsersGoals(UUID userId) {
         return savingGoalRepository.findByUserId(userId);
     }
 
-    public void addGoal(UUID userId, AddGoalRequest request) {
+    public void addGoal(UUID userId, AddGoalRequest request, UserDto data) {
         List<SavingGoal> goals = savingGoalRepository.findByUserId(userId);
 
         SavingGoal newGoal;
@@ -40,6 +44,9 @@ public class SavingGoalService {
         log.info("Saving goal: {}", newGoal);
 
         savingGoalRepository.save(newGoal);
+
+        kafkaProducerService.sendMessage(new NotificationMessage(userId, data.email(), EventType.GOAL_ADDED,
+                null, request.goalAmount(), request.endDate(), null, null));
     }
 
     public void deleteGoal(UUID userId) {

@@ -2,15 +2,13 @@ package org.example.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.client.UserClient;
+import org.example.dto.UserDto;
 import org.example.dto.request.AddPaymentRequest;
-import org.example.entity.RecurringFrequency;
 import org.example.entity.RecurringPayment;
 import org.example.service.RecurringPaymentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,7 +30,8 @@ public class RecurringPaymentController {
     @PostMapping("/add")
     public ResponseEntity<String> addPayment(@RequestHeader(TOKEN) String token, @RequestBody AddPaymentRequest request) {
         UUID userId = userClient.getUserByToken(token);
-        paymentService.addPayment(userId, request.name(), request.amount(), request.startDate(), request.frequency());
+        UserDto data = userClient.getUserData(token);
+        paymentService.addPayment(userId, request, data);
         return ResponseEntity.ok("Payment added");
     }
 

@@ -1,6 +1,8 @@
 package org.example.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +26,9 @@ public class SavingGoal {
     @Column(name = "user_id")
     private UUID userId;
     @Column(name = "goal_amount")
+    @Positive(message = "Значение должно быть больше нуля")
     private BigDecimal goalAmount;
     @Column(name = "end_date")
+    @FutureOrPresent(message = "Значение должно быть позже сегодняшней даты")
     private LocalDate endDate;
 }

@@ -2,13 +2,18 @@ package org.example.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.dto.NotificationMessage;
+import org.example.dto.UserDto;
 import org.example.dto.request.AddTransactionRequest;
 import org.example.entity.Category;
+import org.example.entity.EventType;
 import org.example.entity.Transaction;
 import org.example.entity.TransactionType;
 import org.example.exception.CategoryNotFoundException;
 import org.example.exception.LimitExceedException;
 import org.example.repository.TransactionRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -24,11 +29,14 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final CategoryService categoryService;
     private final LimitService limitService;
+    private final KafkaProducerService kafkaProducerService;
 
-    public void addTransaction(UUID userId, AddTransactionRequest request) {
+    public void addTransaction(UUID userId, AddTransactionRequest request, UserDto data) {
+        log.debug("Id of user to add transaction: {}", userId);
         Optional<Category> addTransactionTo = categoryService.getCategoryByName(request.category(), userId);
+        log.info("Category: {}", addTransactionTo);
         if (addTransactionTo.isEmpty()) {
-            throw new CategoryNotFoundException("Категория с именем " + request.category() + " не найдена.");
+            throw new CategoryNotFoundException("Категория " + request.category() + " не найдена.");
         }
         Transaction transaction = new Transaction();
         validateExpenseLimit(userId, request);
@@ -37,12 +45,17 @@ public class TransactionService {
         transaction.setTransactionType(request.transactionType());
         transaction.setDescription(request.description());
         transaction.setUserId(userId);
+
         transactionRepository.save(transaction);
+
+        kafkaProducerService.sendMessage(new NotificationMessage(userId, data.email(), EventType.TRANSACTION_ADDED,
+                request.category(), request.amount(), null, request.transactionType(), null));
 
     }
 
-    public List<Transaction> getAllTransactions(UUID userId) {
-        return transactionRepository.findByUserId(userId);
+    public Page<Transaction> getAllTransactions(UUID userId, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return transactionRepository.findByUserId(userId, pageRequest);
     }
 
     public BigDecimal calculateTotalExpense(UUID userId) {

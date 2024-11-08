@@ -92,9 +92,10 @@
 
         try {
             const response = await axios.post(`${authURL}/signup`, { name, surname, email, password });
-            const token = response.data.token;
+            const { accessToken, refreshToken } = response.data;
 
-            localStorage.setItem('authToken', token);
+            localStorage.setItem('accessToken', accessToken);
+            localStorage.setItem('refreshToken', refreshToken);
 
             signUpStatus.classList.remove('d-none', 'alert-danger');
             signUpStatus.classList.add('alert-success');

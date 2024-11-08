@@ -2,6 +2,7 @@ package org.example.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.client.UserClient;
+import org.example.dto.UserDto;
 import org.example.dto.request.AddLimitRequest;
 import org.example.dto.request.DeleteLimitRequest;
 import org.example.entity.Limit;
@@ -31,7 +32,8 @@ public class LimitController {
     @PostMapping("/add")
     public ResponseEntity<String> addLimit(@RequestHeader(TOKEN) String token, @RequestBody AddLimitRequest request) {
         UUID userId = userClient.getUserByToken(token);
-        limitService.addLimit(userId, request.maxExpenseLimit(), request.frequency());
+        UserDto data = userClient.getUserData(token);
+        limitService.addLimit(userId, request, data);
         return ResponseEntity.ok("Limit added");
     }
 

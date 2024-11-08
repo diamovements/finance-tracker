@@ -17,27 +17,31 @@ import org.springframework.web.bind.annotation.RequestHeader;
 @RequestMapping("/api/v1/auth")
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
-    private final static String TOKEN = "token";
+    private final static String ACCESS_TOKEN = "accessToken";
+    private final static String REFRESH_TOKEN = "refreshToken";
 
     @PostMapping("/signup")
     public AuthenticationResponse signUp(@RequestBody SignUpRequest request) {
-        String token = authenticationService.signUp(request).token();
-        return new AuthenticationResponse(token);
+        return authenticationService.signUp(request);
     }
 
     @PostMapping("/signin")
     public AuthenticationResponse signIn(@RequestBody SignInRequest request) {
-        String token = authenticationService.signIn(request).token();
-        return new AuthenticationResponse(token);
+        return authenticationService.signIn(request);
     }
 
-    @GetMapping()
-    public boolean isAuthorized(@RequestHeader(TOKEN) String token) {
-        return authenticationService.isAuthorized(token);
+    @PostMapping("/refresh")
+    public AuthenticationResponse refreshAccessToken(@RequestHeader(REFRESH_TOKEN) String refreshToken) {
+        return authenticationService.refreshAccessToken(refreshToken);
+    }
+
+    @GetMapping("/isauthorized")
+    public boolean isAuthorized(@RequestHeader(ACCESS_TOKEN) String accessToken) {
+        return authenticationService.isAuthorized(accessToken);
     }
 
     @GetMapping("/isadmin")
-    public boolean isAdmin(@RequestHeader(TOKEN) String token) {
-        return authenticationService.isAdmin(token);
+    public boolean isAdmin(@RequestHeader(ACCESS_TOKEN) String accessToken) {
+        return authenticationService.isAdmin(accessToken);
     }
 }

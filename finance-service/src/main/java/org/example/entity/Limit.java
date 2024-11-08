@@ -1,6 +1,7 @@
 package org.example.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,7 @@ public class Limit {
     @Column(name = "user_id")
     private UUID userId;
     @Column(name = "max_expense_limit")
+    @Positive
     private BigDecimal maxExpenseLimit;
     @Enumerated(EnumType.STRING)
     @Column(name = "limit_frequency")

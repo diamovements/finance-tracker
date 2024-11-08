@@ -88,9 +88,10 @@
 
         try {
             const response = await axios.post(`${authURL}/signin`, { email, password });
-            const token = response.data.token;
+            const { accessToken, refreshToken } = response.data;
 
-            localStorage.setItem('authToken', token);
+            localStorage.setItem('accessToken', accessToken);
+            localStorage.setItem('refreshToken', refreshToken);
 
             signInStatus.classList.remove('d-none', 'alert-danger');
             signInStatus.classList.add('alert-success');

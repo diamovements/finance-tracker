@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll() // Разрешаем доступ к маршрутам аутентификации
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/isadmin", "/api/v1/isauthorized", "/api/v1/user/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers(HttpMethod.POST, "/api/v1/admin").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/admin").hasRole("ADMIN")

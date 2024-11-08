@@ -2,6 +2,7 @@ package org.example.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.client.UserClient;
+import org.example.dto.UserDto;
 import org.example.dto.request.AddGoalRequest;
 import org.example.entity.SavingGoal;
 import org.example.service.SavingGoalService;
@@ -30,7 +31,8 @@ public class SavingGoalController {
     @PostMapping("/add")
     public ResponseEntity<String> addGoal(@RequestHeader(TOKEN) String token, @RequestBody AddGoalRequest request) {
         UUID userId = userClient.getUserByToken(token);
-        savingGoalService.addGoal(userId, request);
+        UserDto data = userClient.getUserData(token);
+        savingGoalService.addGoal(userId, request, data);
         return ResponseEntity.ok("Goal added");
     }
 

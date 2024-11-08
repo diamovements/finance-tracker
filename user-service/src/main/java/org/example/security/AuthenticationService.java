@@ -7,6 +7,7 @@ import org.example.dto.request.SignUpRequest;
 import org.example.dto.response.AuthenticationResponse;
 import org.example.entity.Role;
 import org.example.entity.User;
+import org.example.exception.ExpiredTokenException;
 import org.example.repository.UserRepository;
 import org.example.service.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,8 +37,9 @@ public class AuthenticationService {
                 .build();
         user = userRepository.save(user);
         log.info("User saved: {}", user.getEmail());
-        String token = jwtService.generateToken(user);
-        return new AuthenticationResponse(token);
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+        return new AuthenticationResponse(accessToken, refreshToken);
     }
 
     @Transactional
@@ -46,8 +48,10 @@ public class AuthenticationService {
                 new UsernamePasswordAuthenticationToken(request.email(), request.password()));
         User user = userRepository.findByEmail(request.email()).orElseThrow(() -> new IllegalArgumentException("Неверный пароль или почта"));
         log.info("User role: {}", user.getRole());
-        String token = jwtService.generateToken(user);
-        return new AuthenticationResponse(token);
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        return new AuthenticationResponse(accessToken, refreshToken);
     }
 
     @Transactional
@@ -61,5 +65,19 @@ public class AuthenticationService {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
         log.info("User role: {}", user.getRole());
         return user.getRole().equals(Role.ROLE_ADMIN);
+    }
+
+    @Transactional
+    public AuthenticationResponse refreshAccessToken(String refreshToken) {
+        if (jwtService.isTokenExpired(refreshToken)) {
+            throw new ExpiredTokenException("Refresh токен истек");
+        }
+
+        String email = jwtService.extractUsername(refreshToken);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
+        String newAccessToken = jwtService.generateAccessToken(user);
+        log.info("New access token: {}", newAccessToken);
+        return new AuthenticationResponse(newAccessToken, refreshToken);
     }
 }

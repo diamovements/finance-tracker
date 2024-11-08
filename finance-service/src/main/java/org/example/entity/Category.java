@@ -21,8 +21,8 @@ public class Category {
     private UUID categoryId;
     @Column(unique = true, name = "category_name")
     private String name;
-    @Column(name = "isStandard")
-    private boolean isStandard;
+    @Column(name = "standard")
+    private boolean standard;
     @Column(name = "user_id")
     private UUID userId;
 }

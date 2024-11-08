@@ -91,12 +91,6 @@
     </style>
 </head>
 <body>
-<script>
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-        window.location.href = 'http://localhost:8082/signup.html';
-    }
-</script>
 <div class="container">
 
     <div class="to-index">
@@ -129,15 +123,58 @@
 </div>
 
 <script>
-    const baseURL = 'http://localhost:8082/api/v1/categories';
-    const quoteURL = 'http://localhost:8082/api/v1/quotes?category=money';
 
+    let token = localStorage.getItem('accessToken');
+    let refreshToken = localStorage.getItem('refreshToken');
+
+    if (!token) {
+        window.location.href = 'http://localhost:8082/signup.html';
+    }
+
+    const categoriesURL = 'http://localhost:8082/api/v1/categories';
+    const quoteURL = 'http://localhost:8082/api/v1/quotes?category=success';
+    const refreshTokenURL = 'http://localhost:8081/api/v1/auth/refresh';
+
+    const axiosInstance = axios.create();
+
+    axiosInstance.interceptors.response.use(
+        response => response,
+        async error => {
+            const originalRequest = error.config;
+
+            if (error.response.status === 401 && !originalRequest._retry) {
+                originalRequest._retry = true;
+
+                try {
+                    const response = await axios.post(refreshTokenURL, null, {
+                        headers: {
+                            'refreshToken': `${refreshToken}`
+                        }
+                    });
+                    const { accessToken, refreshToken: newRefreshToken } = response.data;
+
+                    localStorage.setItem('accessToken', accessToken);
+                    localStorage.setItem('refreshToken', newRefreshToken);
+
+                    axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+                    originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
+                    return axios(originalRequest);
+                } catch (err) {
+                    console.error('Ошибка обновления токена:', err);
+                    window.location.href = 'http://localhost:8082/signup.html';
+                }
+            }
+
+            return Promise.reject(error);
+        }
+    );
+
+    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
     async function loadCategories() {
         try {
-            const response = await axios.get(`${baseURL}/all`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await axiosInstance.get(`${categoriesURL}/all`);
             const categoryList = document.getElementById('categoryList');
             categoryList.innerHTML = '';
             response.data.forEach(category => {
@@ -153,18 +190,17 @@
         const categoryStatus = document.getElementById('categoryStatus');
 
         try {
-            await axios.post(`${baseURL}/add`, { name: categoryName }, {
-                headers: { 'Authorization': `Bearer ${token}` }
+            await axiosInstance.post(`${categoriesURL}/add`, {
+                name: categoryName
             });
 
             categoryStatus.classList.remove('d-none', 'alert-danger');
             categoryStatus.classList.add('alert-success');
             categoryStatus.innerText = 'Категория добавлена успешно';
 
-            // Очищаем поле ввода
             document.getElementById('newCategory').value = '';
 
-            await loadCategories();
+            loadCategories();
         } catch (error) {
             categoryStatus.classList.remove('d-none', 'alert-success');
             categoryStatus.classList.add('alert-danger');
@@ -177,9 +213,7 @@
     async function getCategoryByName() {
         const name = document.getElementById('categoryName').value;
         try {
-            const response = await axios.get(`${baseURL}/${name}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await axiosInstance.get(`${categoriesURL}/${name}`);
             const categoryStatus = document.getElementById('categoryStatus');
             categoryStatus.classList.remove('d-none');
             categoryStatus.innerText = `Category: ${response.data.name}`;
@@ -190,9 +224,7 @@
 
     async function fetchQuote() {
         try {
-            const response = await axios.get(quoteURL, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await axiosInstance.get(quoteURL);
             const quoteData = response.data;
 
             document.getElementById('quoteText').innerText = quoteData.quote;

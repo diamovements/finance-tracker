@@ -1,5 +1,6 @@
 package org.example.security;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -7,7 +8,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.example.exception.ExpiredTokenException;
 import org.example.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,9 +46,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         jwt = authHeader.substring(7);
-        log.info("JWT: {}", jwt);
+        log.info("Access JWT: {}", jwt);
 
-        email = jwtService.extractUsername(jwt);
+        try {
+            email = jwtService.extractUsername(jwt);
+        } catch (ExpiredJwtException | ExpiredTokenException e) {
+            SecurityContextHolder.clearContext();
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write("Token expired");
+            log.error("Access token expired: {}", response.getStatus());
+            return;
+        }
         if (StringUtils.isNotEmpty(email) && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userService.loadUserByUsername(email);
             if (jwtService.isTokenValid(jwt, userDetails)) {

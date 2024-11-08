@@ -1,6 +1,7 @@
 package org.example.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,7 @@ public class RecurringPayment {
     @Column(name = "payment_name")
     private String name;
     @Column(name = "payment_amount")
+    @Positive(message = "Значение должно быть больше нуля")
     private BigDecimal amount;
     @Column(name = "start_date")
     private LocalDate startDate;

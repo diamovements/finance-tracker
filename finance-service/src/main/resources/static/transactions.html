@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             background-color: #FFFFFF;
@@ -41,6 +42,7 @@
             border-radius: 5px;
             box-shadow: none;
         }
+
 
         .btn {
             width: 100%;
@@ -89,15 +91,28 @@
             font-size: 18px;
         }
 
+        #paginationControls .btn-outline-primary {
+            border: none;
+            background: none;
+            font-size: 24px;
+            color: #582FF5;
+        }
+
+        #paginationControls .btn-outline-primary:hover {
+            color: #B6C534;
+        }
+
+        #paginationControls span {
+            text-align: justify;
+            font-size: 20px;
+            font-family: "Exo 2", sans-serif;
+            color: #582FF5;
+        }
+
     </style>
 </head>
 <body>
-<script>
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-        window.location.href = 'http://localhost:8082/signup.html';
-    }
-</script>
+
 <div class="container">
 
     <div class="to-index">
@@ -128,6 +143,16 @@
     <h2>Все транзакции</h2>
     <ul id="transactionList" class="list-group mb-4"></ul>
 
+    <div id="paginationControls" class="d-flex align-items-center mt-3">
+        <button class="btn btn-outline-primary me-2" onclick="previousPage()">
+            <i class="fa-solid fa-circle-chevron-left"></i>
+        </button>
+        <span id="currentPage" class="me-2">1</span>
+        <button class="btn btn-outline-primary" onclick="nextPage()">
+            <i class="fa-solid fa-circle-chevron-right"></i>
+        </button>
+    </div>
+
     <h2>Итоги</h2>
     <button class="btn btn-info mb-2" onclick="calculateTotalExpense()">Общие расходы</button>
     <div id="totalExpense" class="alert alert-info d-none"></div>
@@ -136,14 +161,60 @@
 </div>
 
 <script>
-    const transactionsURL = 'http://localhost:8082/api/v1/transactions';
-    const quoteURL = 'http://localhost:8082/api/v1/quotes?category=money';
+    let token = localStorage.getItem('accessToken');
+    let refreshToken = localStorage.getItem('refreshToken');
 
-    async function fetchAllTransactions() {
+    if (!token) {
+        window.location.href = 'http://localhost:8082/signup.html';
+    }
+
+    const transactionsURL = 'http://localhost:8082/api/v1/transactions';
+    const quoteURL = 'http://localhost:8082/api/v1/quotes?category=success';
+    const refreshTokenURL = 'http://localhost:8081/api/v1/auth/refresh';
+
+    const axiosInstance = axios.create();
+
+    axiosInstance.interceptors.response.use(
+        response => response,
+        async error => {
+            const originalRequest = error.config;
+
+            if (error.response.status === 401 && !originalRequest._retry) {
+                originalRequest._retry = true;
+
+                try {
+                    const response = await axios.post(refreshTokenURL, null, {
+                        headers: {
+                            'refreshToken': `${refreshToken}`
+                        }
+                    });
+                    const { accessToken, refreshToken: newRefreshToken } = response.data;
+
+                    localStorage.setItem('accessToken', accessToken);
+                    localStorage.setItem('refreshToken', newRefreshToken);
+
+                    axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+                    originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
+                    return axios(originalRequest);
+                } catch (err) {
+                    console.error('Ошибка обновления токена:', err);
+                    window.location.href = 'http://localhost:8082/signup.html';
+                }
+            }
+
+            return Promise.reject(error);
+        }
+    );
+
+    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+    let currentPage = 0;
+    const pageSize = 5;
+
+    async function fetchAllTransactions(page = 0, size = pageSize) {
         try {
-            const response = await axios.get(`${transactionsURL}/all`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await axiosInstance.get(`${transactionsURL}/all?page=${page}&size=${size}`);
             const transactionList = document.getElementById('transactionList');
             transactionList.innerHTML = '';
 
@@ -155,8 +226,22 @@
                 <span>${transaction.description}</span>
             </li>`;
             });
+            document.getElementById('currentPage').innerText = `${currentPage + 1}`;
         } catch (error) {
             console.error('Ошибка получения транзакций:', error);
+        }
+    }
+
+
+    function nextPage() {
+        currentPage++;
+        fetchAllTransactions(currentPage);
+    }
+
+    function previousPage() {
+        if (currentPage > 0) {
+            currentPage--;
+            fetchAllTransactions(currentPage);
         }
     }
 
@@ -168,13 +253,11 @@
         const transactionStatus = document.getElementById('transactionStatus');
 
         try {
-            await axios.post(`${transactionsURL}/add`, {
+            await axiosInstance.post(`${transactionsURL}/add`, {
                 amount: parseFloat(amount),
                 transactionType: transactionType,
                 category: category,
                 description: description
-            }, {
-                headers: { 'Authorization': `Bearer ${token}` }
             });
 
             transactionStatus.classList.remove('d-none', 'alert-danger');
@@ -192,9 +275,7 @@
 
     async function calculateTotalExpense() {
         try {
-            const response = await axios.get(`${transactionsURL}/total-expense`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await axiosInstance.get(`${transactionsURL}/total-expense`);
             const totalExpense = document.getElementById('totalExpense');
             totalExpense.classList.remove('d-none');
             totalExpense.innerText = `Общие расходы: ${response.data} руб.`;
@@ -205,9 +286,7 @@
 
     async function calculateTotalIncome() {
         try {
-            const response = await axios.get(`${transactionsURL}/total-income`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await axiosInstance.get(`${transactionsURL}/total-income`);
             const totalIncome = document.getElementById('totalIncome');
             totalIncome.classList.remove('d-none');
             totalIncome.innerText = `Общий доход: ${response.data} руб.`;
@@ -218,9 +297,7 @@
 
     async function fetchQuote() {
         try {
-            const response = await axios.get(quoteURL, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await axiosInstance.get(quoteURL);
             const quoteData = response.data;
 
             document.getElementById('quoteText').innerText = quoteData.quote;

@@ -1,6 +1,16 @@
 package org.example.entity;
 
 public enum TransactionType {
-    INCOME,
-    EXPENSE
+    INCOME {
+        @Override
+        public String toString() {
+            return "Доход";
+        }
+    },
+    EXPENSE {
+        @Override
+        public String toString() {
+            return "Расход";
+        }
+    }
 }

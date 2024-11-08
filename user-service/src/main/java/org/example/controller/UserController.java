@@ -1,8 +1,10 @@
 package org.example.controller;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.dto.UserDto;
+import org.example.exception.ExpiredTokenException;
 import org.example.security.JwtService;
 import org.example.service.UserService;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,6 +1,7 @@
 package org.example.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class Transaction {
     @Column(name = "transaction_id")
     private UUID transactionId;
     @Column(name = "transaction_amount")
+    @Positive(message = "Значение должно быть больше нуля")
     private BigDecimal amount;
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type")

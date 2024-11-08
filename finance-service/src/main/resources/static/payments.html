@@ -90,12 +90,7 @@
     </style>
 </head>
 <body>
-<script>
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-        window.location.href = 'http://localhost:8082/signup.html';
-    }
-</script>
+
 <div class="container">
 
     <div class="to-index">
@@ -136,15 +131,58 @@
 </div>
 
 <script>
+    let token = localStorage.getItem('accessToken');
+    let refreshToken = localStorage.getItem('refreshToken');
+
+    if (!token) {
+        window.location.href = 'http://localhost:8082/signup.html';
+    }
+
     const paymentsURL = 'http://localhost:8082/api/v1/recurring-payments';
-    const quoteURL = 'http://localhost:8082/api/v1/quotes?category=money';
+    const quoteURL = 'http://localhost:8082/api/v1/quotes?category=success';
+    const refreshTokenURL = 'http://localhost:8081/api/v1/auth/refresh';
+
+    const axiosInstance = axios.create();
+
+    axiosInstance.interceptors.response.use(
+        response => response,
+        async error => {
+            const originalRequest = error.config;
+
+            if (error.response.status === 401 && !originalRequest._retry) {
+                originalRequest._retry = true;
+
+                try {
+                    const response = await axios.post(refreshTokenURL, null, {
+                        headers: {
+                            'refreshToken': `${refreshToken}`
+                        }
+                    });
+                    const { accessToken, refreshToken: newRefreshToken } = response.data;
+
+                    localStorage.setItem('accessToken', accessToken);
+                    localStorage.setItem('refreshToken', newRefreshToken);
+
+                    axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+                    originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
+                    return axios(originalRequest);
+                } catch (err) {
+                    console.error('Ошибка обновления токена:', err);
+                    window.location.href = 'http://localhost:8082/signup.html';
+                }
+            }
+
+            return Promise.reject(error);
+        }
+    );
+
+    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
 
     async function fetchAllPayments() {
         try {
-            const response = await axios.get(`${paymentsURL}/all`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await axiosInstance.get(`${paymentsURL}/all`);
             const paymentList = document.getElementById('paymentList');
             paymentList.innerHTML = '';
             response.data.forEach(payment => {
@@ -165,13 +203,11 @@
         const addPaymentStatus = document.getElementById('addPaymentStatus');
 
         try {
-            await axios.post(`${paymentsURL}/add`, {
+            await axiosInstance.post(`${paymentsURL}/add`, {
                 name: name,
                 amount: parseFloat(amount),
                 startDate: startDate,
                 frequency: frequency
-            }, {
-                headers: { 'Authorization': `Bearer ${token}` }
             });
 
             addPaymentStatus.classList.remove('d-none', 'alert-danger');
@@ -192,9 +228,7 @@
         const deletePaymentStatus = document.getElementById('deletePaymentStatus');
 
         try {
-            await axios.delete(`${paymentsURL}/delete/${name}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            await axiosInstance.delete(`${paymentsURL}/delete/${name}`);
 
             deletePaymentStatus.classList.remove('d-none', 'alert-danger');
             deletePaymentStatus.classList.add('alert-success');
@@ -210,9 +244,7 @@
     }
     async function fetchQuote() {
         try {
-            const response = await axios.get(quoteURL, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await axiosInstance.get(quoteURL);
             const quoteData = response.data;
 
             document.getElementById('quoteText').innerText = quoteData.quote;
