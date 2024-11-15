@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background-color: #FFFFFF;
+            font-family: "Exo 2", sans-serif;
+            font-style: normal;
+        }
+
+        h1 {
+            font-weight: bold;
+            color: #F88DD5;
+        }
+
+        h2 {
+            color: #582FF5;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        .alert {
+            margin-top: 10px;
+        }
+
+        .mb-3 {
+            margin-bottom: 20px !important;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            box-shadow: none;
+        }
+
+
+        .btn {
+            width: 100%;
+            background-color: #E0F541;
+            color: #582FF5;
+            border: #582FF5;
+            border-radius: 3px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: #B6C534;
+            color: #3F3271;
+        }
+
+        .list-group-item {
+            padding: 10px 15px;
+            background-color: #FFFFFF;
+            border: none;
+            margin-bottom: 5px;
+            color: #582FF5;
+        }
+
+        .to-index {
+            color: #F88DD5;
+            font-size: 15px;
+        }
+
+        .section {
+            padding-left: 15px;
+            border-left: 4px solid #E0F541;
+            background: #FFFFFF;
+            color: #582FF5;
+            font-style: italic;
+            margin-top: 25px;
+            margin-bottom: 25px;
+            font-size: 20px;
+        }
+
+        .blockquote-footer {
+            color: #582FF5;
+            font-style: italic;
+            margin-top: 5px;
+            font-size: 18px;
+        }
+
+        #paginationControls .btn-outline-primary {
+            border: none;
+            background: none;
+            font-size: 24px;
+            color: #582FF5;
+        }
+
+        #paginationControls .btn-outline-primary:hover {
+            color: #B6C534;
+        }
+
+        #paginationControls span {
+            text-align: justify;
+            font-size: 20px;
+            font-family: "Exo 2", sans-serif;
+            color: #582FF5;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="to-index">
+        <p>Вернуться на <a href="http://localhost:8082/index.html"> главную страницу</a></p>
+    </div>
+
+    <h1>Управление транзакциями</h1>
+
+    <div id="quoteSection" class="section">
+        <p id="quoteText"></p>
+        <footer class="blockquote-footer" id="quoteAuthor"></footer>
+    </div>
+
+    <h2>Добавить транзакцию</h2>
+    <div>
+        <input type="number" id="amount" class="form-control" placeholder="Сумма" step="0.01" required>
+        <select id="transactionType" class="form-control" required>
+            <option value="">Тип транзакции</option>
+            <option value="EXPENSE">Расход</option>
+            <option value="INCOME">Доход</option>
+        </select>
+        <input type="text" id="category" class="form-control" placeholder="Категория" required>
+        <input type="text" id="description" class="form-control" placeholder="Описание">
+        <button class="btn btn-primary" onclick="addTransaction()">Добавить транзакцию</button>
+    </div>
+    <div id="transactionStatus" class="alert d-none"></div>
+
+    <h2>Все транзакции</h2>
+    <ul id="transactionList" class="list-group mb-4"></ul>
+
+    <div id="paginationControls" class="d-flex align-items-center mt-3">
+        <button class="btn btn-outline-primary me-2" onclick="previousPage()">
+            <i class="fa-solid fa-circle-chevron-left"></i>
+        </button>
+        <span id="currentPage" class="me-2">1</span>
+        <button class="btn btn-outline-primary" onclick="nextPage()">
+            <i class="fa-solid fa-circle-chevron-right"></i>
+        </button>
+    </div>
+
+    <h2>Итоги</h2>
+    <button class="btn btn-info mb-2" onclick="calculateTotalExpense()">Общие расходы</button>
+    <div id="totalExpense" class="alert alert-info d-none"></div>
+    <button class="btn btn-success mb-2" onclick="calculateTotalIncome()">Общий доход</button>
+    <div id="totalIncome" class="alert alert-success d-none"></div>
+</div>
+
+<script>
+    let token = localStorage.getItem('accessToken');
+    let refreshToken = localStorage.getItem('refreshToken');
+
+    if (!token) {
+        window.location.href = 'http://localhost:8082/signup.html';
+    }
+
+    const transactionsURL = 'http://localhost:8082/api/v1/transactions';
+    const quoteURL = 'http://localhost:8082/api/v1/quotes?category=success';
+    const refreshTokenURL = 'http://localhost:8081/api/v1/auth/refresh';
+
+    const axiosInstance = axios.create();
+
+    axiosInstance.interceptors.response.use(
+        response => response,
+        async error => {
+            const originalRequest = error.config;
+
+            if (error.response.status === 401 && !originalRequest._retry) {
+                originalRequest._retry = true;
+
+                try {
+                    const response = await axios.post(refreshTokenURL, null, {
+                        headers: {
+                            'refreshToken': `${refreshToken}`
+                        }
+                    });
+                    const { accessToken, refreshToken: newRefreshToken } = response.data;
+
+                    localStorage.setItem('accessToken', accessToken);
+                    localStorage.setItem('refreshToken', newRefreshToken);
+
+                    axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+                    originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
+                    return axios(originalRequest);
+                } catch (err) {
+                    console.error('Ошибка обновления токена:', err);
+                    window.location.href = 'http://localhost:8082/signup.html';
+                }
+            }
+
+            return Promise.reject(error);
+        }
+    );
+
+    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+    let currentPage = 0;
+    const pageSize = 5;
+
+    async function fetchAllTransactions(page = 0, size = pageSize) {
+        try {
+            const response = await axiosInstance.get(`${transactionsURL}/all?page=${page}&size=${size}`);
+            const transactionList = document.getElementById('transactionList');
+            transactionList.innerHTML = '';
+
+            response.data.forEach(transaction => {
+                console.log(transaction);
+                transactionList.innerHTML += `<li class="list-group-item">
+                <span>${transaction.category}: ${transaction.amount}</span>
+                <br/>
+                <span>${transaction.description}</span>
+            </li>`;
+            });
+            document.getElementById('currentPage').innerText = `${currentPage + 1}`;
+        } catch (error) {
+            console.error('Ошибка получения транзакций:', error);
+        }
+    }
+
+
+    function nextPage() {
+        currentPage++;
+        fetchAllTransactions(currentPage);
+    }
+
+    function previousPage() {
+        if (currentPage > 0) {
+            currentPage--;
+            fetchAllTransactions(currentPage);
+        }
+    }
+
+    async function addTransaction() {
+        const amount = document.getElementById('amount').value;
+        const transactionType = document.getElementById('transactionType').value;
+        const category = document.getElementById('category').value;
+        const description = document.getElementById('description').value;
+        const transactionStatus = document.getElementById('transactionStatus');
+
+        try {
+            await axiosInstance.post(`${transactionsURL}/add`, {
+                amount: parseFloat(amount),
+                transactionType: transactionType,
+                category: category,
+                description: description
+            });
+
+            transactionStatus.classList.remove('d-none', 'alert-danger');
+            transactionStatus.classList.add('alert-success');
+            transactionStatus.innerText = 'Транзакция добавлена успешно';
+
+            fetchAllTransactions();
+        } catch (error) {
+            transactionStatus.classList.remove('d-none', 'alert-success');
+            transactionStatus.classList.add('alert-danger');
+            transactionStatus.innerText = 'Ошибка при добавлении транзакции';
+            console.error('Ошибка добавления транзакции:', error);
+        }
+    }
+
+    async function calculateTotalExpense() {
+        try {
+            const response = await axiosInstance.get(`${transactionsURL}/total-expense`);
+            const totalExpense = document.getElementById('totalExpense');
+            totalExpense.classList.remove('d-none');
+            totalExpense.innerText = `Общие расходы: ${response.data} руб.`;
+        } catch (error) {
+            console.error('Ошибка расчета общих расходов:', error);
+        }
+    }
+
+    async function calculateTotalIncome() {
+        try {
+            const response = await axiosInstance.get(`${transactionsURL}/total-income`);
+            const totalIncome = document.getElementById('totalIncome');
+            totalIncome.classList.remove('d-none');
+            totalIncome.innerText = `Общий доход: ${response.data} руб.`;
+        } catch (error) {
+            console.error('Ошибка расчета общего дохода:', error);
+        }
+    }
+
+    async function fetchQuote() {
+        try {
+            const response = await axiosInstance.get(quoteURL);
+            const quoteData = response.data;
+
+            document.getElementById('quoteText').innerText = quoteData.quote;
+            document.getElementById('quoteAuthor').innerText = quoteData.author ? `${quoteData.author}` : '';
+        } catch (error) {
+            document.getElementById('quoteText').innerText = 'Не удалось загрузить цитату';
+            console.error('Ошибка загрузки цитаты:', error);
+        }
+    }
+
+    fetchQuote();
+    fetchAllTransactions();
+</script>
+</body>
+</html>

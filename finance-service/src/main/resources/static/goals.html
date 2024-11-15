@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saving Goals</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #FFFFFF;
+            font-family: "Exo 2", sans-serif;
+            font-style: normal;
+        }
+
+        h1 {
+            font-weight: bold;
+            color: #F88DD5;
+        }
+
+        h2 {
+            color: #582FF5;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        .alert {
+            margin-top: 10px;
+        }
+
+        .mb-3 {
+            margin-bottom: 20px !important;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            box-shadow: none;
+        }
+
+        .btn {
+            width: 100%;
+            background-color: #E0F541;
+            color: #582FF5;
+            border: #582FF5;
+            border-radius: 3px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background-color: #B6C534;
+            color: #3F3271;
+        }
+
+        .list-group-item {
+            padding: 10px 15px;
+            background-color: #FFFFFF;
+            border: none;
+            margin-bottom: 5px;
+            color: #582FF5;
+        }
+
+        .to-index {
+            color: #F88DD5;
+            font-size: 15px;
+        }
+
+        .section {
+            padding-left: 15px;
+            border-left: 4px solid #E0F541;
+            background: #FFFFFF;
+            color: #582FF5;
+            font-style: italic;
+            margin-top: 25px;
+            margin-bottom: 25px;
+            font-size: 20px;
+        }
+
+        .blockquote-footer {
+            color: #582FF5;
+            font-style: italic;
+            margin-top: 5px;
+            font-size: 18px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="to-index">
+        <p>Вернуться на <a href="http://localhost:8082/index.html"> главную страницу</a></p>
+    </div>
+
+    <h1 class="my-4">Управление целями накопления</h1>
+
+    <div id="quoteSection" class="section">
+        <p id="quoteText"></p>
+        <footer class="blockquote-footer" id="quoteAuthor"></footer>
+    </div>
+
+    <h2>Добавить цель</h2>
+    <div class="mb-3">
+        <input type="number" id="goalAmount" class="form-control mb-2" placeholder="Сумма цели" step="0.01" required>
+        <input type="date" id="endDate" class="form-control mb-2" placeholder="Дата завершения" required>
+        <button class="btn btn-primary" onclick="addGoal()">Добавить цель</button>
+    </div>
+    <div id="addGoalStatus" class="alert d-none"></div>
+
+    <h2>Удалить цель</h2>
+    <div class="mb-3">
+        <button class="btn btn-danger" onclick="deleteGoal()">Удалить цель</button>
+    </div>
+    <div id="deleteGoalStatus" class="alert d-none"></div>
+
+    <h2>Все цели</h2>
+    <ul id="goalList" class="list-group mb-4"></ul>
+
+</div>
+
+<script>
+    let token = localStorage.getItem('accessToken');
+    let refreshToken = localStorage.getItem('refreshToken');
+
+    if (!token) {
+        window.location.href = 'http://localhost:8082/signup.html';
+    }
+
+    const goalsURL = 'http://localhost:8082/api/v1/saving-goals';
+    const quoteURL = 'http://localhost:8082/api/v1/quotes?category=success';
+    const refreshTokenURL = 'http://localhost:8081/api/v1/auth/refresh';
+
+    // Настройка Axios
+    const axiosInstance = axios.create();
+
+    axiosInstance.interceptors.response.use(
+        response => response,
+        async error => {
+            const originalRequest = error.config;
+
+            if (error.response.status === 401 && !originalRequest._retry) {
+                originalRequest._retry = true;
+
+                try {
+                    const response = await axios.post(refreshTokenURL, null, {
+                        headers: {
+                            'refreshToken': `${refreshToken}`
+                        }
+                    });
+                    const { accessToken, refreshToken: newRefreshToken } = response.data;
+
+                    localStorage.setItem('accessToken', accessToken);
+                    localStorage.setItem('refreshToken', newRefreshToken);
+
+                    axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+                    originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
+                    return axios(originalRequest);
+                } catch (err) {
+                    console.error('Ошибка обновления токена:', err);
+                    window.location.href = 'http://localhost:8082/signup.html';
+                }
+            }
+
+            return Promise.reject(error);
+        }
+    );
+
+    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+    async function fetchAllGoals() {
+        try {
+            const response = await axiosInstance.get(`${goalsURL}/all`);
+            const goalList = document.getElementById('goalList');
+            goalList.innerHTML = '';
+            response.data.forEach(goal => {
+                goalList.innerHTML += `<li class="list-group-item">
+                    Цель: ${goal.goalAmount}, до: ${goal.endDate}
+                </li>`;
+            });
+        } catch (error) {
+            console.error('Ошибка получения целей:', error);
+        }
+    }
+
+    async function addGoal() {
+        const goalAmount = document.getElementById('goalAmount').value;
+        const endDate = document.getElementById('endDate').value;
+        const addGoalStatus = document.getElementById('addGoalStatus');
+
+        try {
+            await axiosInstance.post(`${goalsURL}/add`, {
+                goalAmount: parseFloat(goalAmount),
+                endDate: endDate
+            });
+
+            addGoalStatus.classList.remove('d-none', 'alert-danger');
+            addGoalStatus.classList.add('alert-success');
+            addGoalStatus.innerText = 'Цель добавлена';
+
+            fetchAllGoals();
+        } catch (error) {
+            addGoalStatus.classList.remove('d-none', 'alert-success');
+            addGoalStatus.classList.add('alert-danger');
+            addGoalStatus.innerText = 'Ошибка при добавлении цели';
+            console.error('Ошибка добавления цели:', error);
+        }
+    }
+
+    async function deleteGoal() {
+        const deleteGoalStatus = document.getElementById('deleteGoalStatus');
+
+        try {
+            await axiosInstance.delete(`${goalsURL}/delete`);
+
+            deleteGoalStatus.classList.remove('d-none', 'alert-danger');
+            deleteGoalStatus.classList.add('alert-success');
+            deleteGoalStatus.innerText = 'Цель удалена';
+
+            fetchAllGoals();
+        } catch (error) {
+            deleteGoalStatus.classList.remove('d-none', 'alert-success');
+            deleteGoalStatus.classList.add('alert-danger');
+            deleteGoalStatus.innerText = 'Ошибка при удалении цели';
+            console.error('Ошибка удаления цели:', error);
+        }
+    }
+
+    async function fetchQuote() {
+        try {
+            const response = await axiosInstance.get(quoteURL);
+            const quoteData = response.data;
+
+            document.getElementById('quoteText').innerText = quoteData.quote;
+            document.getElementById('quoteAuthor').innerText = quoteData.author ? `${quoteData.author}` : '';
+        } catch (error) {
+            document.getElementById('quoteText').innerText = 'Не удалось загрузить цитату';
+            console.error('Ошибка загрузки цитаты:', error);
+        }
+    }
+
+    fetchQuote();
+    fetchAllGoals();
+</script>
+
+</body>
+</html>

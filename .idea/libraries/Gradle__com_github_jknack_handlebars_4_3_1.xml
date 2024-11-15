@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.github.jknack:handlebars:4.3.1" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="com.github.jknack" artifactId="handlebars" version="4.3.1" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.jknack/handlebars/4.3.1/95d9902e78faa2be20a40a75f33b6602b99ee246/handlebars-4.3.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.jknack/handlebars/4.3.1/dc91093987ed1c6f0eb8ff372a46a51d22be9fbb/handlebars-4.3.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

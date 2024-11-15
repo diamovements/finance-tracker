@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лимиты</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Exo+2:ital,wght@0,100..900;1,100..900&family=Fira+Sans+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Russo+One&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #FFFFFF;
+            font-family: "Exo 2", sans-serif;
+            font-style: normal;
+        }
+
+        h1 {
+            font-weight: bold;
+            color: #F88DD5;
+        }
+
+        h2 {
+            color: #582FF5;
+        }
+
+
+        .container {
+            margin-top: 20px;
+        }
+
+        .alert {
+            margin-top: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            background-color: #E0F541;
+            color: #582FF5;
+            border: #582FF5;
+            border-radius: 3px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background-color: #B6C534;
+            color: #3F3271;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .form-control {
+            border-radius: 3px;
+        }
+
+        .to-index {
+            color: #F88DD5;
+            font-size: 15px;
+        }
+
+        .section {
+            padding-left: 15px;
+            border-left: 4px solid #E0F541;
+            background: #FFFFFF;
+            color: #582FF5;
+            font-style: italic;
+            margin-top: 25px;
+            margin-bottom: 25px;
+            font-size: 20px;
+        }
+
+        .blockquote-footer {
+            color: #582FF5;
+            font-style: italic;
+            margin-top: 5px;
+            font-size: 18px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="to-index">
+        <p>Вернуться на <a href="http://localhost:8082/index.html"> главную страницу</a></p>
+    </div>
+
+    <h1 class="my-4">Управление лимитами</h1>
+
+    <div id="quoteSection" class="section">
+        <p id="quoteText"></p>
+        <footer class="blockquote-footer" id="quoteAuthor"></footer>
+    </div>
+
+    <h2>Добавить лимит</h2>
+    <div class="mb-3">
+        <input type="number" id="maxExpenseLimit" class="form-control mb-2" placeholder="Лимит трат" required>
+        <select id="frequency" class="form-control mb-2" required>
+            <option value="">Выберите, на какое время установить лимит</option>
+            <option value="DAILY">Каждый день</option>
+            <option value="WEEKLY">Каждая неделя</option>
+            <option value="MONTHLY">Каждый месяц</option>
+        </select>
+        <button class="btn btn-primary" onclick="addLimit()">Добавить лимит</button>
+    </div>
+    <div id="addLimitStatus" class="alert d-none"></div>
+
+    <h2>Список текущих лимитов</h2>
+    <div id="limitsList" class="mb-3"></div>
+
+    <h2>Удалить лимит</h2>
+    <div class="mb-3">
+        <input type="text" id="deleteFrequency" class="form-control mb-2" placeholder="Удалить лимит по времени" required>
+        <button class="btn btn-danger" onclick="deleteLimit()">Удалить лимит</button>
+    </div>
+    <div id="deleteLimitStatus" class="alert d-none"></div>
+</div>
+
+<script>
+    let token = localStorage.getItem('accessToken');
+    let refreshToken = localStorage.getItem('refreshToken');
+
+    if (!token) {
+        window.location.href = 'http://localhost:8082/signup.html';
+    }
+
+    const limitsURL = 'http://localhost:8082/api/v1/limits';
+    const quoteURL = 'http://localhost:8082/api/v1/quotes?category=success';
+    const refreshTokenURL = 'http://localhost:8081/api/v1/auth/refresh';
+
+    const axiosInstance = axios.create();
+
+    axiosInstance.interceptors.response.use(
+        response => response,
+        async error => {
+            const originalRequest = error.config;
+
+            if (error.response.status === 401 && !originalRequest._retry) {
+                originalRequest._retry = true;
+
+                try {
+                    const response = await axios.post(refreshTokenURL, null, {
+                        headers: {
+                            'refreshToken': `${refreshToken}`
+                        }
+                    });
+                    const { accessToken, refreshToken: newRefreshToken } = response.data;
+
+                    localStorage.setItem('accessToken', accessToken);
+                    localStorage.setItem('refreshToken', newRefreshToken);
+
+                    axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+                    originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
+                    return axios(originalRequest);
+                } catch (err) {
+                    console.error('Ошибка обновления токена:', err);
+                    window.location.href = 'http://localhost:8082/signup.html';
+                }
+            }
+
+            return Promise.reject(error);
+        }
+    );
+
+    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+
+    async function fetchUserLimits() {
+        try {
+            const response = await axiosInstance.get(`${limitsURL}/all`);
+            const limitsList = document.getElementById('limitsList');
+            limitsList.innerHTML = '';
+            response.data.forEach(limit => {
+                limitsList.innerHTML += `<li class="list-group-item">
+                    Частота: ${limit.frequency.toString()}, Лимит: ${limit.maxExpenseLimit}
+                </li>`;
+            });
+        } catch (error) {
+            console.error('Ошибка получения платежей:', error);
+        }
+    }
+
+    async function addLimit() {
+        const maxExpenseLimit = document.getElementById('maxExpenseLimit').value;
+        const frequency = document.getElementById('frequency').value;
+        const addLimitStatus = document.getElementById('addLimitStatus');
+
+        try {
+            await axiosInstance.post(`${limitsURL}/add`, {
+                maxExpenseLimit: maxExpenseLimit,
+                frequency: frequency
+            });
+
+            addLimitStatus.classList.remove('d-none', 'alert-danger');
+            addLimitStatus.classList.add('alert-success');
+            addLimitStatus.innerText = 'Лимит добавлен';
+
+            fetchUserLimits();
+        } catch (error) {
+            addLimitStatus.classList.remove('d-none', 'alert-success');
+            addLimitStatus.classList.add('alert-danger');
+            addLimitStatus.innerText = 'Ошибка при добавлении лимита';
+            console.error('Ошибка добавления лимита:', error);
+        }
+    }
+
+    async function deleteLimit() {
+        const deleteFrequency = document.getElementById('deleteFrequency').value;
+        const deleteLimitStatus = document.getElementById('deleteLimitStatus');
+
+        try {
+
+            await axiosInstance.delete(`${limitsURL}/delete`, {
+                data: {
+                    frequency: deleteFrequency
+                }
+            });
+            deleteLimitStatus.classList.remove('d-none', 'alert-danger');
+            deleteLimitStatus.classList.add('alert-success');
+            deleteLimitStatus.innerText = 'Лимит удален';
+
+            fetchUserLimits();
+        } catch (error) {
+            deleteLimitStatus.classList.remove('d-none', 'alert-success');
+            deleteLimitStatus.classList.add('alert-danger');
+            deleteLimitStatus.innerText = 'Ошибка при удалении лимита';
+            console.error('Ошибка удаления лимита:', error);
+        }
+    }
+    async function fetchQuote() {
+        try {
+            const response = await axiosInstance.get(quoteURL);
+            const quoteData = response.data;
+
+            document.getElementById('quoteText').innerText = quoteData.quote;
+            document.getElementById('quoteAuthor').innerText = quoteData.author ? `${quoteData.author}` : '';
+        } catch (error) {
+            document.getElementById('quoteText').innerText = 'Не удалось загрузить цитату';
+            console.error('Ошибка загрузки цитаты:', error);
+        }
+    }
+
+    fetchQuote();
+    fetchUserLimits();
+</script>
+</body>
+</html>

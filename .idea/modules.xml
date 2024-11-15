@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/finance-service.iml" filepath="$PROJECT_DIR$/.idea/modules/finance-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/finance-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/finance-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/finance-service.test.iml" filepath="$PROJECT_DIR$/.idea/modules/finance-service.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/finance-tracker.iml" filepath="$PROJECT_DIR$/.idea/finance-tracker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/notification-service.iml" filepath="$PROJECT_DIR$/.idea/modules/notification-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/notification-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/notification-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/notification-service.test.iml" filepath="$PROJECT_DIR$/.idea/modules/notification-service.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/user-service.iml" filepath="$PROJECT_DIR$/.idea/modules/user-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/user-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/user-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/user-service.test.iml" filepath="$PROJECT_DIR$/.idea/modules/user-service.test.iml" />
+    </modules>
+  </component>
+</project>
