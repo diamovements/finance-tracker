@@ -38,7 +38,7 @@ feign:
         readTimeout: 5000
 
 quotes:
-  api-key: "Yc9lCi12snjQ63BUAO/vRw==bJBuCARy78f61s23"
+  api-key: "${QUOTES_API_KEY}"
 
 logging:
   level:

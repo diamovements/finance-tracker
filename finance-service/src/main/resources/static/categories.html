@@ -16,6 +16,19 @@
             font-style: normal;
         }
 
+        .container  button, .btn {
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+        }
+
+        .container  button:active, .btn:active {
+            transform: scale(0.95);
+        }
+
+        .container  button:hover, .btn:hover {
+            background-color: #B6C534;
+            color: #582FF5;
+        }
+
         h1 {
             font-weight: bold;
             color: #F88DD5;
@@ -107,7 +120,7 @@
     <h2>Добавить категорию</h2>
     <div class="mb-3">
         <input type="text" id="newCategory" class="form-control mb-2" placeholder="Введите название категории">
-        <button class="btn btn-primary" onclick="addCategory()">Добавить категорию</button>
+        <button class="btn" onclick="addCategory()">Добавить категорию</button>
     </div>
 
     <h2>Все категории</h2>
@@ -116,7 +129,7 @@
     <h2>Найти категорию</h2>
     <div class="mb-3">
         <input type="text" id="categoryName" class="form-control mb-2" placeholder="Найти категорию по названию">
-        <button class="btn btn-secondary" onclick="getCategoryByName()">Найти</button>
+        <button class="btn" onclick="getCategoryByName()">Найти</button>
     </div>
     <div id="categoryStatus" class="alert d-none"></div>
 

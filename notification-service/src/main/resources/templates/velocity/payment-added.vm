@@ -1,0 +1,8 @@
+<html>
+    <body>
+        <h3>Привет!</h3>
+        <p>Новый регулярный платеж $name с суммой $amount рублей.</p>
+        <p>Дата начала: $date</p>
+        <img src="cid:image"/>
+    </body>
+</html>

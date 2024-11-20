@@ -1,5 +1,7 @@
 plugins {
     id 'java'
+    id 'checkstyle'
+    id 'jacoco'
 }
 
 group = 'org.example'
@@ -49,7 +51,42 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka:3.2.4")
     implementation("org.springframework.boot:spring-boot-starter-mail:3.3.5")
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
+    implementation("org.apache.velocity:velocity-engine-core:2.4.1")
+    implementation("org.apache.velocity.tools:velocity-tools-generic:3.1")
 
+}
+
+jacocoTestReport {
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    'org/example/dto/**',
+                    'org/example/config/**',
+                    '**/NotificationServiceApp.*',
+                    '**/MailService.*'
+            ])
+        }))
+    }
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+checkstyle {
+    toolVersion '10.3.1'
+    configFile file("config/checkstyle/checkstyle.xml")
+    ignoreFailures = false
+    maxWarnings = 0
+    maxErrors = 0
+}
+checkstyleMain {
+    source ='src/main/java'
+}
+
+checkstyleTest {
+    source ='src/main/test'
 }
 
 test {

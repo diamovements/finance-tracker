@@ -6,13 +6,12 @@ import org.example.dto.NotificationMessage;
 import org.example.dto.UserDto;
 import org.example.dto.request.AddPaymentRequest;
 import org.example.entity.EventType;
-import org.example.entity.RecurringFrequency;
 import org.example.entity.RecurringPayment;
+import org.example.exception.PaymentNotFoundException;
 import org.example.repository.RecurringPaymentRepository;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
+;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -65,6 +64,12 @@ public class RecurringPaymentService {
     public void deletePayment(UUID userId, String name) {
         Optional<RecurringPayment> deletePayment = paymentRepository.findByUserIdAndName(userId, name);
         log.info("Deleting payment: {}", deletePayment);
-        deletePayment.ifPresent(paymentRepository::delete);
+        if (deletePayment.isEmpty()) {
+            log.error("Payment not found: {}", name);
+            throw new PaymentNotFoundException("Payment not found");
+        }
+        else {
+            paymentRepository.delete(deletePayment.get());
+        }
     }
 }

@@ -18,19 +18,19 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(CategoryNotFoundException.class)
     @ResponseBody
     public ResponseEntity<String> handleCategoryNotFoundException(CategoryNotFoundException ex) {
-        return new ResponseEntity<>("Ошибка: " + ex.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("Произошла ошибка: " + ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(LimitNotFoundException.class)
     @ResponseBody
     public ResponseEntity<String> handleLimitNotFoundException(LimitNotFoundException ex) {
-        return new ResponseEntity<>("Ошибка: " + ex.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("Произошла ошибка: " + ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(GoalNotFoundException.class)
     @ResponseBody
     public ResponseEntity<String> handleGoalNotFoundException(GoalNotFoundException ex) {
-        return new ResponseEntity<>("Ошибка: " + ex.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("Произошла ошибка: " + ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ResponseStatusException.class)
@@ -39,6 +39,16 @@ public class ControllerExceptionHandler {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Ошибка: токен истек или недействителен.");
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Произошла ошибка на сервере.");
+    }
+
+    @ExceptionHandler(LimitExceedException.class)
+    public ResponseEntity<String> handleLimitExceedException(LimitExceedException ex) {
+        return new ResponseEntity<>("Произошла ошибка: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(PaymentNotFoundException.class)
+    public ResponseEntity<String> handlePaymentNotFoundException(PaymentNotFoundException ex) {
+        return new ResponseEntity<>("Произошла ошибка: " + ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
 }

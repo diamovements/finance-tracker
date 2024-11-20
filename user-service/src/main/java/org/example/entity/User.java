@@ -47,6 +47,8 @@ public class User implements UserDetails{
     @Column(nullable = false)
     private Role role;
 
+    private String resetCode;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));

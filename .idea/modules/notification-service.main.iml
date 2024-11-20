@@ -34,6 +34,8 @@
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-data-jpa:3.3.4" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter:3.3.5" level="project" />
     <orderEntry type="library" name="Gradle: org.projectlombok:lombok:1.18.34" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.velocity.tools:velocity-tools-generic:3.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.velocity:velocity-engine-core:2.4.1" level="project" />
     <orderEntry type="library" name="Gradle: org.wiremock.integrations.testcontainers:wiremock-testcontainers-module:1.0-alpha-13" level="project" />
     <orderEntry type="library" name="Gradle: org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0" level="project" />
     <orderEntry type="library" name="Gradle: ch.qos.logback:logback-classic:1.5.11" level="project" />
@@ -78,6 +80,10 @@
     <orderEntry type="library" name="Gradle: jakarta.annotation:jakarta.annotation-api:2.1.1" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-core:6.1.14" level="project" />
     <orderEntry type="library" name="Gradle: org.yaml:snakeyaml:2.2" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.commons:commons-lang3:3.17.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.commons:commons-digester3:3.2" level="project" />
+    <orderEntry type="library" name="Gradle: commons-beanutils:commons-beanutils:1.9.4" level="project" />
+    <orderEntry type="library" name="Gradle: com.github.cliftonlabs:json-simple:3.0.2" level="project" />
     <orderEntry type="library" name="Gradle: org.testcontainers:testcontainers:1.19.1" level="project" />
     <orderEntry type="library" name="Gradle: org.springdoc:springdoc-openapi-starter-webmvc-api:2.6.0" level="project" />
     <orderEntry type="library" name="Gradle: org.webjars:swagger-ui:5.17.14" level="project" />
@@ -126,6 +132,8 @@
     <orderEntry type="library" name="Gradle: org.apache.logging.log4j:log4j-to-slf4j:2.23.1" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:jul-to-slf4j:2.0.16" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-jcl:6.1.14" level="project" />
+    <orderEntry type="library" name="Gradle: commons-logging:commons-logging:1.2" level="project" />
+    <orderEntry type="library" name="Gradle: commons-collections:commons-collections:3.2.2" level="project" />
     <orderEntry type="library" name="Gradle: com.github.docker-java:docker-java-api:3.3.3" level="project" />
     <orderEntry type="library" name="Gradle: com.github.docker-java:docker-java-transport-zerodep:3.3.3" level="project" />
     <orderEntry type="library" name="Gradle: junit:junit:4.13.2" level="project" />
@@ -168,7 +176,6 @@
     <orderEntry type="library" name="Gradle: io.github.resilience4j:resilience4j-consumer:2.1.0" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.0" level="project" />
     <orderEntry type="library" name="Gradle: io.swagger.core.v3:swagger-models-jakarta:2.2.22" level="project" />
-    <orderEntry type="library" name="Gradle: org.apache.commons:commons-lang3:3.14.0" level="project" />
     <orderEntry type="library" name="Gradle: io.swagger.core.v3:swagger-annotations-jakarta:2.2.22" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: jakarta.xml.bind:jakarta.xml.bind-api:3.0.1" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-codec-socks:4.1.112.Final" level="project" />

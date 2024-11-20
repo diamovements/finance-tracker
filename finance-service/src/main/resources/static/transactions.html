@@ -17,6 +17,19 @@
             font-style: normal;
         }
 
+        .container  button, .btn {
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+        }
+
+        .container  button:active, .btn:active {
+            transform: scale(0.95);
+        }
+
+        .container  button:hover, .btn:hover {
+            background-color: #B6C534;
+            color: #582FF5;
+        }
+
         h1 {
             font-weight: bold;
             color: #F88DD5;
@@ -136,7 +149,7 @@
         </select>
         <input type="text" id="category" class="form-control" placeholder="Категория" required>
         <input type="text" id="description" class="form-control" placeholder="Описание">
-        <button class="btn btn-primary" onclick="addTransaction()">Добавить транзакцию</button>
+        <button class="btn" onclick="addTransaction()">Добавить транзакцию</button>
     </div>
     <div id="transactionStatus" class="alert d-none"></div>
 
@@ -154,9 +167,9 @@
     </div>
 
     <h2>Итоги</h2>
-    <button class="btn btn-info mb-2" onclick="calculateTotalExpense()">Общие расходы</button>
+    <button class="btn" onclick="calculateTotalExpense()">Общие расходы</button>
     <div id="totalExpense" class="alert alert-info d-none"></div>
-    <button class="btn btn-success mb-2" onclick="calculateTotalIncome()">Общий доход</button>
+    <button class="btn" onclick="calculateTotalIncome()">Общий доход</button>
     <div id="totalIncome" class="alert alert-success d-none"></div>
 </div>
 

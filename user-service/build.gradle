@@ -1,5 +1,7 @@
 plugins {
     id 'application'
+    id 'checkstyle'
+    id 'jacoco'
 }
 
 group = 'org.example'
@@ -51,9 +53,46 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-impl:0.12.6")
     implementation("io.github.openfeign:feign-core:13.5")
     implementation("org.springframework.boot:spring-boot-starter-mail:3.3.5")
+    testImplementation("org.testcontainers:postgresql:1.20.2")
+    testImplementation("io.rest-assured:rest-assured:5.5.0")
+    implementation("org.springframework.kafka:spring-kafka:3.2.4")
+
 
 }
 
+jacocoTestReport {
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    'org/example/dto/**',
+                    'org/example/config/**',
+                    'org/example/entity/**',
+                    'org/example/exception/**',
+                    '**/UserServiceApp.*'
+            ])
+        }))
+    }
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+checkstyle {
+    toolVersion '10.3.1'
+    configFile file("config/checkstyle/checkstyle.xml")
+    ignoreFailures = false
+    maxWarnings = 0
+    maxErrors = 0
+}
+checkstyleMain {
+    source ='src/main/java'
+}
+
+checkstyleTest {
+    source ='src/main/test'
+}
 
 java {
     toolchain {
@@ -62,5 +101,9 @@ java {
 }
 
 application {
-    mainClass = 'org.example.Main'
+    mainClass = 'org.example.UserServiceApp'
+}
+
+test {
+    useJUnitPlatform()
 }

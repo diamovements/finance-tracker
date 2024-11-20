@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.dto.request.ResetPasswordRequest;
 import org.example.dto.request.SignInRequest;
 import org.example.dto.request.SignUpRequest;
 import org.example.dto.response.AuthenticationResponse;
@@ -40,8 +41,14 @@ public class AuthenticationController {
         return authenticationService.isAuthorized(accessToken);
     }
 
-    @GetMapping("/isadmin")
-    public boolean isAdmin(@RequestHeader(ACCESS_TOKEN) String accessToken) {
-        return authenticationService.isAdmin(accessToken);
+    @PostMapping("/reset-password-request")
+    public void requestPasswordReset(@RequestBody String email) {
+        authenticationService.initiatePasswordReset(email);
     }
+
+    @PostMapping("/reset-password-confirm")
+    public void confirmPasswordReset(@RequestBody ResetPasswordRequest request) {
+        authenticationService.confirmPasswordReset(request);
+    }
+
 }
