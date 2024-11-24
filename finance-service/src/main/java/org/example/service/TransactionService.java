@@ -59,14 +59,14 @@ public class TransactionService {
     }
 
     public BigDecimal calculateTotalExpense(UUID userId) {
-        return transactionRepository.findByUserId(userId).stream()
+        return transactionRepository.findAllByUserId(userId).stream()
                 .filter(transaction -> transaction.getTransactionType().equals(TransactionType.EXPENSE))
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public BigDecimal calculateTotalIncome(UUID userId) {
-        return transactionRepository.findByUserId(userId).stream()
+        return transactionRepository.findAllByUserId(userId).stream()
                 .filter(transaction -> transaction.getTransactionType().equals(TransactionType.INCOME))
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

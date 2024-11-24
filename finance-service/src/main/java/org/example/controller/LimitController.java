@@ -41,7 +41,7 @@ public class LimitController {
         return ResponseEntity.ok("Limit added");
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping ("/delete")
     public ResponseEntity<String> deleteLimit(@RequestHeader(TOKEN) String token, @RequestBody DeleteLimitRequest request) {
         UUID userId = userClient.getUserByToken(token);
         limitService.deleteLimit(userId, request.frequency());

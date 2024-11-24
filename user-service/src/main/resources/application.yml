@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: 111
+    url: "${POSTGRES_URL}"
+    username: "${POSTGRES_USERNAME}"
+    password: "${POSTGRES_PASSWORD}"
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -17,7 +17,7 @@ spring:
       add-mappings: true
 security:
   jwt:
-    secret: "f58e49672b17942765a058e3a8723599ea89857edfff555bf3ff026a966ef34f"
+    secret: "${JWT_SECRET_KEY}"
     expiration: 1800000
     refresh-expiration: 2592000000
 server:

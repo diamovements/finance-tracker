@@ -87,11 +87,11 @@ public class TransactionServiceTest {
         transaction.setAmount(BigDecimal.valueOf(1000));
         transaction.setTransactionType(TransactionType.EXPENSE);
 
-        Mockito.when(transactionRepository.findByUserId(userId)).thenReturn(List.of(transaction));
+        Mockito.when(transactionRepository.findAllByUserId(userId)).thenReturn(List.of(transaction));
         BigDecimal result = transactionService.calculateTotalExpense(userId);
 
         assertEquals(transaction.getAmount(), result);
-        Mockito.verify(transactionRepository, times(1)).findByUserId(userId);
+        Mockito.verify(transactionRepository, times(1)).findAllByUserId(userId);
     }
 
     @Test
@@ -100,11 +100,11 @@ public class TransactionServiceTest {
         transaction.setAmount(BigDecimal.valueOf(1000));
         transaction.setTransactionType(TransactionType.INCOME);
 
-        Mockito.when(transactionRepository.findByUserId(userId)).thenReturn(List.of(transaction));
+        Mockito.when(transactionRepository.findAllByUserId(userId)).thenReturn(List.of(transaction));
         BigDecimal result = transactionService.calculateTotalIncome(userId);
 
         assertEquals(transaction.getAmount(), result);
-        Mockito.verify(transactionRepository, times(1)).findByUserId(userId);
+        Mockito.verify(transactionRepository, times(1)).findAllByUserId(userId);
     }
 
     @Test
@@ -117,7 +117,7 @@ public class TransactionServiceTest {
         transaction.setCategory(new Category());
 
         Mockito.when(limitService.getCurrentLimit(userId)).thenReturn(new BigDecimal(2000));
-        Mockito.when(transactionRepository.findByUserId(userId)).thenReturn(List.of(transaction));
+        Mockito.when(transactionRepository.findAllByUserId(userId)).thenReturn(List.of(transaction));
         Mockito.doReturn(new BigDecimal(1000)).when(transactionServiceSpy).calculateTotalExpense(userId);
 
         assertDoesNotThrow(() -> transactionService.validateExpenseLimit(userId, expenseRequest));
@@ -134,7 +134,7 @@ public class TransactionServiceTest {
         transaction.setCategory(new Category());
 
         Mockito.when(limitService.getCurrentLimit(userId)).thenReturn(new BigDecimal(1000));
-        Mockito.when(transactionRepository.findByUserId(userId)).thenReturn(List.of(transaction));
+        Mockito.when(transactionRepository.findAllByUserId(userId)).thenReturn(List.of(transaction));
         Mockito.doReturn(new BigDecimal(2000)).when(transactionServiceSpy).calculateTotalExpense(userId);
 
         assertThrows(LimitExceedException.class, () -> transactionService.validateExpenseLimit(userId, expenseRequest));

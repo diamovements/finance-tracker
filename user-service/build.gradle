@@ -2,6 +2,7 @@ plugins {
     id 'application'
     id 'checkstyle'
     id 'jacoco'
+    id 'org.springframework.boot' version '3.3.4'
 }
 
 group = 'org.example'
@@ -29,8 +30,8 @@ dependencies {
     implementation("org.springframework:spring-jdbc:6.1.13")
     testImplementation("com.github.tomakehurst:wiremock-jre8:2.35.0")
     testImplementation("org.assertj:assertj-core:3.26.3")
-    testImplementation("org.testcontainers:junit-jupiter:1.18.0")
-    testImplementation ("org.testcontainers:testcontainers:1.18.3")
+    testImplementation("org.testcontainers:junit-jupiter:1.20.4")
+    testImplementation ("org.testcontainers:testcontainers:1.20.4")
     implementation("org.wiremock.integrations.testcontainers:wiremock-testcontainers-module:1.0-alpha-13")
     implementation("org.springframework.boot:spring-boot-starter-cache:3.3.4")
     implementation("io.github.resilience4j:resilience4j-circuitbreaker:2.2.0")
@@ -53,7 +54,7 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-impl:0.12.6")
     implementation("io.github.openfeign:feign-core:13.5")
     implementation("org.springframework.boot:spring-boot-starter-mail:3.3.5")
-    testImplementation("org.testcontainers:postgresql:1.20.2")
+    testImplementation("org.testcontainers:postgresql:1.20.4")
     testImplementation("io.rest-assured:rest-assured:5.5.0")
     implementation("org.springframework.kafka:spring-kafka:3.2.4")
 
@@ -96,13 +97,14 @@ checkstyleTest {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(19)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
 application {
     mainClass = 'org.example.UserServiceApp'
 }
+
 
 test {
     useJUnitPlatform()

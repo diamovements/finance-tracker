@@ -38,7 +38,7 @@ public class MailService {
             helper.setTo(to);
             helper.setText(stringWriter.toString(), true);
             helper.addInline("image", new ClassPathResource(path));
-            log.info("Receiver: {}", to);
+            log.info("Email with subject {} sent", subject);
 
             mailSender.send(message);
 
