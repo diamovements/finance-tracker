@@ -1,0 +1,8 @@
+<html>
+    <body>
+        <h3>Привет!</h3>
+        <p>Новый лимит на сумму $amount рублей.</p>
+        <p>Периодичность лимита: $frequency</p>
+        <img src="cid:image"/>
+    </body>
+</html>

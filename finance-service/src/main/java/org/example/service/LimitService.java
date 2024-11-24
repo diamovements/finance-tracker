@@ -51,14 +51,13 @@ public class LimitService {
 
         limitRepository.save(newLimit);
 
-        log.info("Limit saved: {}", limitRepository.findByUserId(userId).get(0).getMaxExpenseLimit());
+        log.info("Limit saved: {}", limitRepository.findByUserId(userId).stream().toList());
 
         kafkaProducerService.sendMessage(new NotificationMessage(userId, data.email(), EventType.LIMIT_ADDED,
                 null, request.maxExpenseLimit(), null, null, request.frequency()));
 
     }
     @Transactional
-
     public void deleteLimit(UUID userId, RecurringFrequency frequency) {
         List<Limit> limits = limitRepository.findByUserId(userId);
 
@@ -71,7 +70,7 @@ public class LimitService {
             limitRepository.delete(limitToDelete.get());
         } else {
             log.warn("No limit found for userId {} with frequency {}", userId, frequency);
-            throw new LimitNotFoundException("У вас нет лимита с такой частотой оплаты.");
+            throw new LimitNotFoundException("У вас нет лимита с такой частотой.");
         }
     }
 

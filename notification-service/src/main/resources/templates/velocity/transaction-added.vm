@@ -1,0 +1,8 @@
+<html>
+    <body>
+        <h3>Привет!</h3>
+        <p>Новая транзакция в категории $name на сумму $amount рублей.</p>
+        <p>Тип операции: $transactionType</p>
+        <img src="cid:image"/>
+    </body>
+</html>

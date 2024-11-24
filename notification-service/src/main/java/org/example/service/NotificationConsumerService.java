@@ -2,8 +2,12 @@ package org.example.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.dto.NotificationMessage;
+import org.example.dto.PasswordResetNotification;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -23,33 +27,58 @@ public class NotificationConsumerService {
         }
     }
 
+    @KafkaListener(topics = "reset_topic", groupId = "my-group")
+    public void listenResetNotifications(PasswordResetNotification message) {
+        handleResetPasswordNotification(message);
+    }
+
     public void handlePaymentNotification(NotificationMessage message) {
-        String content = "Новый регулярный платеж " + message.name() + " с суммой " + message.amount()
-                + " рублей. Дата начала: " + message.date();
-        mailService.sendMail(message.email(), "Регулярный платеж добавлен!", content, PATH);
+        Map<String, Object> model = new HashMap<>();
+        model.put("name", message.name());
+        model.put("amount", message.amount());
+        model.put("date", message.date());
+
+        mailService.sendMail(message.email(), "Регулярный платеж добавлен!", PATH, "payment-added.vm", model);
+    }
+
+    public void handleResetPasswordNotification(PasswordResetNotification message) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("code", message.code());
+        model.put("email", message.email());
+
+        mailService.sendMail(message.email(), "Подтверждение сброса пароля", PATH, "reset-password.vm", model);
     }
 
     public void handleCategoryNotification(NotificationMessage message) {
-        String content = "Новая категория расходов " + message.name();
-        mailService.sendMail(message.email(), "Категория расходов добавлена!", content, PATH);
+        Map<String, Object> model = new HashMap<>();
+        model.put("name", message.name());
+
+        mailService.sendMail(message.email(), "Категория добавлена!", PATH, "category-added.vm", model);
     }
 
     public void handleLimitNotification(NotificationMessage message) {
-        String content = "Новый лимит на сумму " + message.amount() + " рублей. Периодичность лимита: " + message.frequency().toString();
-        mailService.sendMail(message.email(), "Лимит добавлен!", content, PATH);
+        Map<String, Object> model = new HashMap<>();
+        model.put("amount", message.amount());
+        model.put("frequency", message.frequency());
+
+        mailService.sendMail(message.email(), "Лимит добавлен!", PATH, "limit-added.vm", model);
     }
 
     public void handleTransactionNotification(NotificationMessage message) {
-        String content = "Новая транзакция в категории " + message.name() + " на сумму " + message.amount()
-                + " рублей. Тип операции: " + message.transactionType().toString();
-        mailService.sendMail(message.email(), "Транзакция добавлена!", content, PATH);
+        Map<String, Object> model = new HashMap<>();
+        model.put("name", message.name());
+        model.put("amount", message.amount());
+        model.put("transactionType", message.transactionType());
+
+        mailService.sendMail(message.email(), "Транзакция добавлена!", PATH, "transaction-added.vm", model);
     }
 
     public void handleGoalNotification(NotificationMessage message) {
-        String content = "Новая цель на сумму " + message.amount() + " рублей. Дата достижения: " + message.date();
-        mailService.sendMail(message.email(), "Цель добавлена!", content, PATH);
+        Map<String, Object> model = new HashMap<>();
+        model.put("amount", message.amount());
+        model.put("date", message.date());
+
+        mailService.sendMail(message.email(), "Цель добавлена!", PATH, "goal-added.vm", model);
     }
-
-
 
 }

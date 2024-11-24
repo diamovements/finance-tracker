@@ -16,6 +16,19 @@
             font-style: normal;
         }
 
+        .container  button, .btn {
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+        }
+
+        .container  button:active, .btn:active {
+            transform: scale(0.95);
+        }
+
+        .container  button:hover, .btn:hover {
+            background-color: #B6C534;
+            color: #582FF5;
+        }
+
         h1 {
             font-weight: bold;
             color: #F88DD5;
@@ -68,7 +81,7 @@
         <input type="text" id="signupSurname" class="form-control mb-2" placeholder="Фамилия">
         <input type="text" id="signupEmail" class="form-control mb-2" placeholder="Почта">
         <input type="password" id="signupPassword" class="form-control mb-2" placeholder="Пароль">
-        <button class="btn btn-primary" onclick="signUp()">Зарегистрироваться</button>
+        <button class="btn" onclick="signUp()">Зарегистрироваться</button>
     </div>
     <div id="signUpStatus" class="alert d-none"></div>
 

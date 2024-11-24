@@ -16,6 +16,19 @@
             font-style: normal;
         }
 
+        .container  button, .btn {
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+        }
+
+        .container  button:active, .btn:active {
+            transform: scale(0.95);
+        }
+
+        .container  button:hover, .btn:hover {
+            background-color: #B6C534;
+            color: #582FF5;
+        }
+
         h1 {
             font-weight: bold;
             color: #582FF5;
@@ -71,6 +84,31 @@
         .alert {
             margin-top: 15px;
         }
+
+        .reset {
+            margin-top: 15px;
+            font-family: "Exo 2", sans-serif;
+            color: #582FF5;
+            font-weight: bold;
+        }
+
+        .reset p {
+            font-size: 20px;
+            color: #582FF5;
+        }
+
+        .reset h3 {
+            font-weight:  bold;
+        }
+
+        .reset .btn {
+            background-color: #E0F541;
+            color: #582FF5;
+            border: none;
+            font-weight: bold;
+        }
+
+
     </style>
 </head>
 <body>
@@ -91,11 +129,30 @@
 
         <div class="mt-4">
             <input type="number" id="newBalance" class="form-control" placeholder="Введите новый баланс">
-            <button class="btn btn-primary mt-2" onclick="updateBalance()">Сохранить</button>
+            <button class="btn" onclick="updateBalance()">Сохранить</button>
         </div>
     </div>
 
     <div id="statusMessage" class="alert d-none"></div>
+
+    <div class="reset">
+        <h3>Смена пароля</h3>
+
+        <div id="requestResetSection">
+            <p>Хочу сбросить пароль</p>
+            <input type="email" id="resetEmail" class="form-control" placeholder="Введите почту">
+            <button class="btn" onclick="requestPasswordReset()">Отправить код</button>
+            <div id="requestResetMessage" class="alert d-none"></div>
+        </div>
+
+        <div id="confirmResetSection" class="d-none">
+            <p>Подтверждение сброса пароля</p>
+            <input type="text" id="resetCode" class="form-control" placeholder="Введите код подтверждения">
+            <input type="password" id="newPassword" class="form-control mt-2" placeholder="Введите новый пароль">
+            <button class="btn" onclick="confirmPasswordReset()">Сменить пароль</button>
+            <div id="confirmResetMessage" class="alert d-none"></div>
+        </div>
+    </div>
 
     <button class="btn logout-btn" onclick="logout()">Выйти из аккаунта</button>
 </div>
@@ -111,6 +168,8 @@
     const accountURL = 'http://localhost:8082/api/v1/account';
     const refreshTokenURL = 'http://localhost:8081/api/v1/auth/refresh';
     const accountBalanceURL = 'http://localhost:8082/api/v1/account/balance';
+    const resetPasswordRequestURL = 'http://localhost:8081/api/v1/auth/reset-password-request';
+    const confirmPasswordResetURL = 'http://localhost:8081/api/v1/auth/reset-password-confirm';
 
 
     const axiosInstance = axios.create();
@@ -198,6 +257,56 @@
         localStorage.removeItem('refreshToken');
         window.location.href = 'http://localhost:8082/signup.html';
     }
+
+    async function requestPasswordReset() {
+        const email = document.getElementById('resetEmail').value;
+        const messageBox = document.getElementById('requestResetMessage');
+
+        try {
+            await axiosInstance.post(resetPasswordRequestURL, email, {
+                headers: {
+                    'Content-Type': 'text/plain'
+                }
+            });
+            messageBox.classList.remove('d-none', 'alert-danger');
+            messageBox.classList.add('alert', 'alert-success');
+            messageBox.innerText = 'Код сброса пароля отправлен на вашу почту';
+
+            document.getElementById('requestResetSection').classList.add('d-none');
+            document.getElementById('confirmResetSection').classList.remove('d-none');
+        } catch (error) {
+            messageBox.classList.remove('d-none', 'alert-success');
+            messageBox.classList.add('alert', 'alert-danger');
+            messageBox.innerText = 'Не удалось отправить код сброса пароля. Проверьте почту и попробуйте снова.';
+            console.error('Ошибка при запросе сброса пароля:', error);
+        }
+    }
+
+    async function confirmPasswordReset() {
+        const resetCode = document.getElementById('resetCode').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const email = document.getElementById('resetEmail').value;
+        const messageBox = document.getElementById('confirmResetMessage');
+
+        const requestPayload = {
+            email: email,
+            code: resetCode,
+            newPassword: newPassword
+        };
+
+        try {
+            await axiosInstance.post(confirmPasswordResetURL, requestPayload);
+            messageBox.classList.remove('d-none', 'alert-danger');
+            messageBox.classList.add('alert', 'alert-success');
+            messageBox.innerText = 'Пароль успешно изменен. Вы можете войти в систему с новым паролем.';
+        } catch (error) {
+            messageBox.classList.remove('d-none', 'alert-success');
+            messageBox.classList.add('alert', 'alert-danger');
+            messageBox.innerText = 'Не удалось сменить пароль. Проверьте код подтверждения и попробуйте снова.';
+            console.error('Ошибка при подтверждении сброса пароля:', error);
+        }
+    }
+
     loadAccountData();
 </script>
 </body>

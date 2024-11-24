@@ -15,6 +15,19 @@
             font-family: "Exo 2", sans-serif;
         }
 
+        .container  button, .btn {
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+        }
+
+        .container  button:active, .btn:active {
+            transform: scale(0.95);
+        }
+
+        .container  button:hover, .btn:hover {
+            background-color: #B6C534;
+            color: #582FF5;
+        }
+
         h1 {
             font-weight: bold;
             color: #F88DD5;
@@ -115,14 +128,14 @@
             <option value="WEEKLY">Каждая неделя</option>
             <option value="MONTHLY">Каждый месяц</option>
         </select>
-        <button class="btn btn-primary" onclick="addPayment()">Добавить платеж</button>
+        <button class="btn" onclick="addPayment()">Добавить платеж</button>
     </div>
     <div id="addPaymentStatus" class="alert d-none"></div>
 
     <h2>Удалить платеж</h2>
     <div class="mb-3">
         <input type="text" id="deletePaymentName" class="form-control mb-2" placeholder="Название платежа для удаления" required>
-        <button class="btn btn-secondary" onclick="deletePayment()">Удалить платеж</button>
+        <button class="btn" onclick="deletePayment()">Удалить платеж</button>
     </div>
     <div id="deletePaymentStatus" class="alert d-none"></div>
 

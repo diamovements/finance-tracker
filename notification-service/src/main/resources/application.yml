@@ -1,6 +1,8 @@
 image:
   path: "static/img/logo.png"
 spring:
+  velocity:
+    resource-loader-path: classpath:/templates/velocity
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres

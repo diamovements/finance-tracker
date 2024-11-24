@@ -6,18 +6,21 @@ import org.example.dto.UserDto;
 import org.example.dto.request.AddTransactionRequest;
 import org.example.dto.response.TransactionResponse;
 import org.example.entity.Transaction;
-import org.example.entity.TransactionType;
 import org.example.exception.LimitExceedException;
-import org.example.service.LimitService;
 import org.example.service.TransactionService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/transactions")
@@ -40,7 +43,7 @@ public class TransactionController {
         } catch (LimitExceedException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-        return ResponseEntity.ok("Transaction added successfully");
+        return ResponseEntity.ok("Transaction added");
     }
 
     @GetMapping("/all")

@@ -16,6 +16,19 @@
             font-style: normal;
         }
 
+        .container  button, .btn {
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+        }
+
+        .container  button:active, .btn:active {
+            transform: scale(0.95);
+        }
+
+        .container  button:hover, .btn:hover {
+            background-color: #B6C534;
+            color: #582FF5;
+        }
+
         h1 {
             font-weight: bold;
             color: #F88DD5;
@@ -106,7 +119,7 @@
             <option value="WEEKLY">Каждая неделя</option>
             <option value="MONTHLY">Каждый месяц</option>
         </select>
-        <button class="btn btn-primary" onclick="addLimit()">Добавить лимит</button>
+        <button class="btn" onclick="addLimit()">Добавить лимит</button>
     </div>
     <div id="addLimitStatus" class="alert d-none"></div>
 
@@ -116,7 +129,7 @@
     <h2>Удалить лимит</h2>
     <div class="mb-3">
         <input type="text" id="deleteFrequency" class="form-control mb-2" placeholder="Удалить лимит по времени" required>
-        <button class="btn btn-danger" onclick="deleteLimit()">Удалить лимит</button>
+        <button class="btn" onclick="deleteLimit()">Удалить лимит</button>
     </div>
     <div id="deleteLimitStatus" class="alert d-none"></div>
 </div>

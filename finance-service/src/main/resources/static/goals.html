@@ -16,6 +16,19 @@
             font-style: normal;
         }
 
+        .container  button, .btn {
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+        }
+
+        .container  button:active, .btn:active {
+            transform: scale(0.95);
+        }
+
+        .container  button:hover, .btn:hover {
+            background-color: #B6C534;
+            color: #582FF5;
+        }
+
         h1 {
             font-weight: bold;
             color: #F88DD5;
@@ -109,13 +122,13 @@
     <div class="mb-3">
         <input type="number" id="goalAmount" class="form-control mb-2" placeholder="Сумма цели" step="0.01" required>
         <input type="date" id="endDate" class="form-control mb-2" placeholder="Дата завершения" required>
-        <button class="btn btn-primary" onclick="addGoal()">Добавить цель</button>
+        <button class="btn" onclick="addGoal()">Добавить цель</button>
     </div>
     <div id="addGoalStatus" class="alert d-none"></div>
 
     <h2>Удалить цель</h2>
     <div class="mb-3">
-        <button class="btn btn-danger" onclick="deleteGoal()">Удалить цель</button>
+        <button class="btn" onclick="deleteGoal()">Удалить цель</button>
     </div>
     <div id="deleteGoalStatus" class="alert d-none"></div>
 
