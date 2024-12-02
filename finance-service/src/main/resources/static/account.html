@@ -240,7 +240,7 @@
 
         try {
             const response = await axiosInstance.post(accountBalanceURL, { balance: parseFloat(newBalance) });
-
+            await loadAccountData();
             document.getElementById('userBalance').innerText = response.data.balance;
             statusMessage.classList.remove('d-none', 'alert-danger');
             statusMessage.classList.add('alert', 'alert-success');

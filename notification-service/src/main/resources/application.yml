@@ -37,3 +37,21 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+management:
+  server:
+    port: 8080
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,metrics
+  metrics:
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true
+    enable:
+      all: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true

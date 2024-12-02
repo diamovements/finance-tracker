@@ -56,3 +56,21 @@ springdoc:
   enable-data-rest: false
   swagger-ui:
     url: "/openapi.yml"
+
+management:
+  server:
+    port: 8082
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,metrics
+  metrics:
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true
+    enable:
+      all: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true

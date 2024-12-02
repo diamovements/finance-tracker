@@ -23,4 +23,22 @@ security:
 server:
   port: 8081
 
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,metrics
+  metrics:
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true
+    enable:
+      all: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
 

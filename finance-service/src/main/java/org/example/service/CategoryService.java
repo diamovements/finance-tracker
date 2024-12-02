@@ -2,7 +2,6 @@ package org.example.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.client.UserClient;
 import org.example.dto.NotificationMessage;
 import org.example.dto.UserDto;
 import org.example.dto.request.AddCategoryRequest;
@@ -12,7 +11,6 @@ import org.example.repository.CategoryRepository;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;

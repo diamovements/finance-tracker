@@ -13,7 +13,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class NotificationConsumerService {
     private final MailService mailService;
-    private final static String PATH = "static/img/banner.png";
+    private final static String PATH = "static/img/banner_logo.png";
 
     @KafkaListener(topics = "notification_topic", groupId = "my-group")
     public void listenNotifications(NotificationMessage message) {

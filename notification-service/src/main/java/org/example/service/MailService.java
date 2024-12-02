@@ -19,9 +19,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class MailService {
+
     private final JavaMailSender mailSender;
-    @Value("${spring.mail.username}")
-    private String sender;
+
     private final VelocityEngine velocityEngine;
 
     public void sendMail(String to, String subject, String path, String templateName, Map<String, Object> model) {
