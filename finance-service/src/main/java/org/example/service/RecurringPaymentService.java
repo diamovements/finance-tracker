@@ -11,7 +11,6 @@ import org.example.exception.PaymentNotFoundException;
 import org.example.repository.RecurringPaymentRepository;
 import org.springframework.stereotype.Service;
 
-;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

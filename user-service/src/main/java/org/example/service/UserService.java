@@ -28,7 +28,7 @@ public class UserService implements UserDetailsService{
     @Transactional
     public UserDto getUser(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
-        log.info("Пользователь {} получен", user.getEmail());
+        log.info("Пользователь {} получен", user.getName());
         return new UserDto(user.getName(), user.getSurname(), user.getEmail());
     }
 

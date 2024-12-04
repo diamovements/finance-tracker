@@ -41,7 +41,7 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(request.password()))
                 .build();
         user = userRepository.save(user);
-        log.info("User saved: {}", user.getEmail());
+        log.info("User saved: {}", user.getName());
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
         return new AuthenticationResponse(accessToken, refreshToken);
@@ -74,7 +74,7 @@ public class AuthenticationService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
         String newAccessToken = jwtService.generateAccessToken(user);
-        log.info("New access token: {}", newAccessToken);
+        log.info("New access token given");
         return new AuthenticationResponse(newAccessToken, refreshToken);
     }
 

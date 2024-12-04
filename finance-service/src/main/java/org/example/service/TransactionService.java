@@ -17,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -59,14 +58,14 @@ public class TransactionService {
     }
 
     public BigDecimal calculateTotalExpense(UUID userId) {
-        return transactionRepository.findByUserId(userId).stream()
+        return transactionRepository.findAllByUserId(userId).stream()
                 .filter(transaction -> transaction.getTransactionType().equals(TransactionType.EXPENSE))
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public BigDecimal calculateTotalIncome(UUID userId) {
-        return transactionRepository.findByUserId(userId).stream()
+        return transactionRepository.findAllByUserId(userId).stream()
                 .filter(transaction -> transaction.getTransactionType().equals(TransactionType.INCOME))
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

@@ -21,7 +21,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-class NotificationConsumerServiceTest {
+class NotificationServiceTest {
 
     @Mock
     private MailService mailService;
@@ -31,7 +31,7 @@ class NotificationConsumerServiceTest {
     @InjectMocks
     private NotificationConsumerService notificationConsumerService;
 
-    public NotificationConsumerServiceTest() {
+    public NotificationServiceTest() {
         MockitoAnnotations.openMocks(this);
     }
 

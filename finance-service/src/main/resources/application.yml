@@ -1,6 +1,14 @@
 spring:
+  flyway:
+    url: "${POSTGRES_URL}"
+    user: "${POSTGRES_USERNAME}"
+    password: "${POSTGRES_PASSWORD}"
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: '0'
+    locations: classpath:db/migration
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9092
     consumer:
       group-id: my-group
       auto-offset-reset: earliest
@@ -10,9 +18,9 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: 111
+    url: "${POSTGRES_URL}"
+    username: "${POSTGRES_USERNAME}"
+    password: "${POSTGRES_PASSWORD}"
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -25,7 +33,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 user-service:
-  url: "http://localhost:8081/api/v1/user"
+  url: "http://user-service:8081/api/v1/user"
 
 server:
   port: 8082
@@ -43,3 +51,26 @@ quotes:
 logging:
   level:
     root: info
+
+springdoc:
+  enable-data-rest: false
+  swagger-ui:
+    url: "/openapi.yml"
+
+management:
+  server:
+    port: 8082
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,metrics
+  metrics:
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true
+    enable:
+      all: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
