@@ -48,5 +48,55 @@ _Метрики доступны по адресу ```http://localhost:3000```_
 
 _Документация доступна по адресу ```http://localhost:8082/swagger-ui/index.html```_
 
+### Демонстрация работы приложения
+
+**Главная страница**
+
+![image](https://github.com/user-attachments/assets/a3926d8d-27be-4d15-b47e-974f386cf35d)
+
+**Страница входа**
+
+![image](https://github.com/user-attachments/assets/939a2878-4e89-4fba-8ba4-7eff2b8549d4)
+
+**Страница регистрации**
+
+![image](https://github.com/user-attachments/assets/69c1302f-b765-4417-b1b6-e2462cf723fc)
+
+**Личный кабинет**
+
+![image](https://github.com/user-attachments/assets/b9ef0400-0188-484c-a5b1-b57116f38d11)
+
+**Лимиты**
+
+![image](https://github.com/user-attachments/assets/0133b65f-89b1-4f2a-a4e1-591adb1cfe61)
+
+**Категории**
+
+![image](https://github.com/user-attachments/assets/7294bd5f-bf64-4b52-b09c-84bd9f4777d7)
+
+**Транзакции**
+
+![image](https://github.com/user-attachments/assets/4594365f-5af9-45f0-8048-5badb8e32333)
+
+**Цели**
+
+![image](https://github.com/user-attachments/assets/ae536cea-766f-4d5a-90f5-239b44640625)
+
+**Регулярные платежи**
+
+![image](https://github.com/user-attachments/assets/02f1276e-9bb7-4d83-9b08-81d7bb648ed3)
+
+**Смена пароля**
+
+![image](https://github.com/user-attachments/assets/291a6454-6159-4c65-8cd8-7e50e85d1d11)
+
+**Уведомление о добавлении платежа**
+
+![image](https://github.com/user-attachments/assets/b6be46eb-9abe-411a-a49c-8d165653add1)
+
+
+
+
+
 
 
