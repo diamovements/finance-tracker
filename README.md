@@ -48,6 +48,20 @@ _Метрики доступны по адресу ```http://localhost:3000```_
 
 _Документация доступна по адресу ```http://localhost:8082/swagger-ui/index.html```_
 
+### Примечание
+
+Для корректной работы приложения необходимо создать файл .env в корне проекта и добавить туда следующие секреты:
+```
+JWT_SECRET_KEY=<ваш jwt ключ>
+GOOGLE_MAIL_PASSWORD=<ваш пароль для google mail>
+GOOGLE_MAIL_USERNAME=<ваша почта google>
+QUOTES_API_KEY=<ваш api ключ>
+POSTGRES_USERNAME=<ваше имя пользователя postgresql>
+POSTGRES_PASSWORD=<ваш пароль postgresql>
+POSTGRES_URL=<ваш адрес БД>
+```
+API ключ для сервиса цитат можно получить здесь: ```https://api-ninjas.com/api/quotes```
+
 ### Демонстрация работы приложения
 
 **Главная страница**
